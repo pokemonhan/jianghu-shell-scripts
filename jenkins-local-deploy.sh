@@ -37,6 +37,9 @@ case $BUILD_USER_FIRST_NAME in
     "taibo")
    destination_dir="$shareprj/taibophp/$tailPath"
       ;;
+    "ethan")
+   destination_dir="$shareprj/ethan/$tailPath"
+      ;;
    *)
      echo "FFFFFFFFFF";
      ;;
