@@ -60,7 +60,7 @@ server {
 
     location ~ \.php\$ {
         try_files \$uri /index.php =404;
-        fastcgi_pass php-fpm73:9000;
+        fastcgi_pass php-fpm-tom:9000;
         fastcgi_index index.php;
         fastcgi_buffers 16 16k;
         fastcgi_buffer_size 32k;
