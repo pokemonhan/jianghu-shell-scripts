@@ -95,7 +95,7 @@ do
   else
     echo "\t\033[41mPHPCS Failed: $FILE\033[0m"
     rm -rf "$TMP_DIR" "$containerTmpDIR"
-    exit $?
+    exit 1
   fi
       ########Checking Stan#############
       ssh -l $destination_user $destination_host \
@@ -116,7 +116,7 @@ do
       #####################
 #      echo "tmpdir is $TMP_DIR and containerTmpDIR is $containerTmpDIR"
       rm -rf "$TMP_DIR" "$containerTmpDIR"
-      exit $?
+      exit 1
     fi
         #####################
     done
