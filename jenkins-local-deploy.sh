@@ -29,16 +29,20 @@ destination_host='172.19.0.1';
 destination_user='root';
 case $BUILD_USER_FIRST_NAME in
    "Harris")
-   destination_dir="$shareprj/harris/$tailPath"
+   dirUser="harris";
+   destination_dir="$shareprj/$dirUser/$tailPath"
       ;;
     "Alvin")
-   destination_dir="$shareprj/alvinphp/$tailPath"
+    dirUser='alvinphp';
+   destination_dir="$shareprj/$dirUser/$tailPath"
       ;;
     "taibo")
-   destination_dir="$shareprj/taibophp/$tailPath"
+   dirUser='taibophp';
+   destination_dir="$shareprj/$dirUser/$tailPath"
       ;;
     "ethan")
-   destination_dir="$shareprj/ethan/$tailPath"
+   dirUser='ethan';
+   destination_dir="$shareprj/$dirUser/$tailPath"
       ;;
    *)
      echo "FFFFFFFFFF";
@@ -50,6 +54,7 @@ case $Type  in
 #    echo "Action Name is : $ActionName";
 #    echo "Request Name is : $RequestName";
 #    echo "Artisan Command is : $ArtisanCommand";
+#chown -R ${dirUser}:${dirUser} ${destination_dir}/*;\
     ssh -l $destination_user $destination_host \
                   -o PasswordAuthentication=no    \
                   -o StrictHostKeyChecking=no     \
@@ -64,6 +69,13 @@ case $Type  in
                   php artisan config:cache;\
                   chmod -R 777 ${destination_dir}/storage;\
                   chmod -R 777 ${destination_dir}/vendor;\
+                  GET_COMMAND=\"ls -ld $destination_dir\";\
+                  GETCOMMND_RESULT=\$(\$GET_COMMAND);\
+                  OWNER=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=3);\
+                  GROUP=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=4);\
+                  echo ow is \$OWNER;\
+                  echo gp is \$GROUP;\
+                  chown -R \$OWNER:\$GROUP $destination_dir/*;\
 "
     ##################################################################
     ;;
@@ -84,6 +96,13 @@ case $Type  in
                   php artisan config:cache;\
                   chmod -R 777 ${destination_dir}/storage;\
                   chmod -R 777 ${destination_dir}/vendor;\
+                  GET_COMMAND=\"ls -ld $destination_dir\";\
+                  GETCOMMND_RESULT=\$(\$GET_COMMAND);\
+                  OWNER=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=3);\
+                  GROUP=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=4);\
+                  echo ow is \$OWNER;\
+                  echo gp is \$GROUP;\
+                  chown -R \$OWNER:\$GROUP $destination_dir/*;\
 "
   ;;
   "Clear Cache")
@@ -102,8 +121,35 @@ case $Type  in
                         php artisan cache:clear;\
                         php artisan route:cache;\
                         php artisan config:cache;\
-      "
+                        chmod -R 777 ${destination_dir}/storage;\
+                        chmod -R 777 ${destination_dir}/vendor;\
+                       GET_COMMAND=\"ls -ld $destination_dir\";\
+                       GETCOMMND_RESULT=\$(\$GET_COMMAND);\
+                       OWNER=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=3);\
+                       GROUP=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=4);\
+                       echo ow is \$OWNER;\
+                       echo gp is \$GROUP;\
+                       chown -R \$OWNER:\$GROUP $destination_dir/*;\
+"
   ;;
+
+#ssh -l root 172.19.0.1 \
+#                   -o PasswordAuthentication=no    \
+#                   -o StrictHostKeyChecking=no     \
+#                   -o UserKnownHostsFile=/dev/null \
+#                   -p 2225                         \
+#                   -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+#                  "cd /var/www/shareprj/ethan/site/jianghu_entertain;\
+#                   GET_COMMAND=\"ls -ld /var/www/shareprj/ethan/site/jianghu_entertain\";\
+#                   echo \$GET_COMMAND;\
+#                   GETCOMMND_RESULT=\$(\$GET_COMMAND);\
+#                   echo \$GETCOMMND_RESULT;\
+#                   OWNER=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=3);\
+#                   GROUP=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=4);\
+#                   echo owner is \$OWNER;\
+#                   echo group is \$GROUP;\
+#   "
+
   "Dump Autoload")
       echo "Type is :$Type"
     echo "Action Name is : $ActionName";
@@ -117,6 +163,15 @@ case $Type  in
                       -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
                      "cd $destination_dir;\
                      /usr/local/bin/composer dump-autoload;\
+                     chmod -R 777 ${destination_dir}/storage;\
+                     chmod -R 777 ${destination_dir}/vendor;\
+                     GET_COMMAND=\"ls -ld $destination_dir\";\
+                     GETCOMMND_RESULT=\$(\$GET_COMMAND);\
+                     OWNER=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=3);\
+                     GROUP=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=4);\
+                     echo ow is \$OWNER;\
+                     echo gp is \$GROUP;\
+                     chown -R \$OWNER:\$GROUP $destination_dir/*;\
                       "
     ;;
   "Create Action")
@@ -141,13 +196,22 @@ fi
                          "cd $destination_dir;\
                          $ActionCommand;\
                          /usr/local/bin/composer dump-autoload;\
-                          "
+                         chmod -R 777 ${destination_dir}/storage;\
+                         chmod -R 777 ${destination_dir}/vendor;\
+                         GET_COMMAND=\"ls -ld $destination_dir\";\
+                         GETCOMMND_RESULT=\$(\$GET_COMMAND);\
+                         OWNER=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=3);\
+                         GROUP=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=4);\
+                         echo ow is \$OWNER;\
+                         echo gp is \$GROUP;\
+                         chown -R \$OWNER:\$GROUP $destination_dir/*;\
+"
   ;;
   "Manual")
       echo "Type is :$Type"
 #    echo "Action Name is : $ActionName";
 #    echo "Request Name is : $RequestName";
-#    echo "Artisan Command is : $ArtisanCommand";
+    echo "Artisan Command is : $ArtisanCommand";
     ssh -l $destination_user $destination_host \
                           -o PasswordAuthentication=no    \
                           -o StrictHostKeyChecking=no     \
@@ -156,7 +220,16 @@ fi
                           -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
                          "cd $destination_dir;\
                          $ArtisanCommand;\
-    "
+                         chmod -R 777 ${destination_dir}/storage;\
+                         chmod -R 777 ${destination_dir}/vendor;\
+                         GET_COMMAND=\"ls -ld $destination_dir\";\
+                         GETCOMMND_RESULT=\$(\$GET_COMMAND);\
+                         OWNER=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=3);\
+                         GROUP=\$(echo \$GETCOMMND_RESULT | cut --delimiter=' ' --fields=4);\
+                         echo ow is \$OWNER;\
+                         echo gp is \$GROUP;\
+                         chown -R \$OWNER:\$GROUP $destination_dir/*;\
+"
   ;;
   "Delete")
       echo "Type is :$Type"
@@ -170,7 +243,7 @@ fi
                           -p 2225                         \
                           -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
                          "cd $destination_dir;\
-                         rm -rf $destination_dir/$FilePath;\
+                          rm -rf $destination_dir/$FilePath;\
     "
   ;;
   *)
