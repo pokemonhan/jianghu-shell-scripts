@@ -52,8 +52,8 @@ do
         if [ -z "$gitDiff" ]
         then
               continue
-        else
-              echo "different is $gitDiff";
+#        else
+#              echo "different is $gitDiff";
         fi
         ######################################################
         containerPrjDIR="$containerTmpDIR/jianghu_entertain"
@@ -76,8 +76,8 @@ do
         if [ -z "$gitDiff" ]
         then
               continue
-        else
-              echo "different is $gitDiff";
+#        else
+#              echo "different is $gitDiff";
         fi
         ######################################################
         containerTmpDIR="/var/www/tmp$TMP_DIR"
