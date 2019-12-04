@@ -64,10 +64,18 @@ do
         git show ${newrev}:${file} > "$TMP_DIR/source/$file"
         ######################################################
 #        echo "starting Cat"
-#        cat "$TMP_DIR/source/$file"
+        cat "$TMP_DIR/source/$file"
         currentFile="$containerPrjDIR/$file"
         echo "rp currentFile is $currentFile"
-        cp -f "$TMP_DIR/source/$file" "$currentFile"
+        if [ -f "$currentFile" ]; then
+          echo "replacing file"
+          echo "file to replace is $currentFile"
+          cp "$TMP_DIR/source/$file" "$currentFile"
+          echo "content is"
+          cat $currentFile
+        else
+          cp -f "$TMP_DIR/source/$file" "$currentFile"
+        fi
     done
     #######################
     for file in ${list}; do
@@ -90,7 +98,9 @@ do
 #        chmod -R 777 "/var/www/tmp/"
         echo "TMP_DIR IS $TMP_DIR and file is $file"
         echo "complete file is $TMP_DIR/source/$file"
-#        cat "$currentFile"
+        echo "now currentFile path is $currentFile"
+        git show ${newrev}:${file} > "$currentFile"
+        cat "$currentFile"
         RULESET="$containerPrjDIR/phpcs.xml"
         echo "RULESET is $RULESET";
         PHPCS_BIN="$containerPrjDIR/vendor/bin/phpcs"
@@ -115,7 +125,7 @@ do
     echo "\t\033[32mPHPCS Passed: $FILE\033[0m result"
   else
     echo "\t\033[41mPHPCS Failed: $FILE\033[0m"
-    rm -rf "$TMP_DIR" "$containerTmpDIR"
+#    rm -rf "$TMP_DIR" "$containerTmpDIR"
     exit 1
   fi
       ########Checking Stan#############
@@ -136,13 +146,14 @@ do
       echo "Code Quality Test Failed"
       #####################
 #      echo "tmpdir is $TMP_DIR and containerTmpDIR is $containerTmpDIR"
-      rm -rf "$TMP_DIR" "$containerTmpDIR"
-      exit 1
+#      rm -rf "$TMP_DIR" "$containerTmpDIR"
+      exit $?
+#      exit 1 #temporary blocked
     fi
         #####################
     done
 done
 
 # cleanup
-rm -rf "$TMP_DIR" "$containerTmpDIR"
+#rm -rf "$TMP_DIR" "$containerTmpDIR"
 exit $?
