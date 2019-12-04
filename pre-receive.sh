@@ -37,28 +37,49 @@ fi
 while read oldrev newrev ref;
 do
     list=$(git diff-tree --name-only -r $oldrev..$newrev | grep -e '.php' -e '.phtml')
+#    echo "start to echo inside list **********************";
+#    printf '%s\n' "${list}"
+#    echo "**********************";
     #######################
     for file in ${list}; do
-      containerTmpDIR="/var/www/tmp$TMP_DIR"
+        containerTmpDIR="/var/www/tmp$TMP_DIR"
         echo "rp containerTmpDIR is $containerTmpDIR"
         mkdir -m 777 -p "$containerTmpDIR"
         ##################
         cp -rf "$destination_dir" "$containerTmpDIR"
-        ##################
+        #####################################################
+        gitDiff=$(git show ${newrev}:${file});
+        if [ -z "$gitDiff" ]
+        then
+              continue
+        else
+              echo "different is $gitDiff";
+        fi
+        ######################################################
         containerPrjDIR="$containerTmpDIR/jianghu_entertain"
         echo "rp containerPrjDIR is $containerPrjDIR"
         mkdir -p $(dirname "$containerPrjDIR/$file")
-        ######################################################
         # dirty hack for create dir tree
         mkdir -p $(dirname "$TMP_DIR/source/$file")
         git show ${newrev}:${file} > "$TMP_DIR/source/$file"
-        #################
+        ######################################################
+#        echo "starting Cat"
+#        cat "$TMP_DIR/source/$file"
         currentFile="$containerPrjDIR/$file"
         echo "rp currentFile is $currentFile"
         cp -f "$TMP_DIR/source/$file" "$currentFile"
     done
     #######################
     for file in ${list}; do
+        #####################################################
+        gitDiff=$(git show ${newrev}:${file});
+        if [ -z "$gitDiff" ]
+        then
+              continue
+        else
+              echo "different is $gitDiff";
+        fi
+        ######################################################
         containerTmpDIR="/var/www/tmp$TMP_DIR"
         echo "containerTmpDIR is $containerTmpDIR"
         containerPrjDIR="$containerTmpDIR/jianghu_entertain"
@@ -79,14 +100,14 @@ do
         autoloadPath="$containerPrjDIR/vendor/autoload.php"
         echo "autoloadPath is $autoloadPath";
         ########Checking Stan#############
+        ####tree $containerPrjDIR;\
         ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
         -o UserKnownHostsFile=/dev/null \
         -p 2225                         \
         -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-       "tree $containerPrjDIR;\
-       cd $containerPrjDIR/vendor/bin;\
+       "cd $containerPrjDIR/vendor/bin;\
 ./phpcs --standard=$RULESET $currentFile"
   EXIT_STATUS=$?
   echo "exist status is $EXIT_STATUS"
