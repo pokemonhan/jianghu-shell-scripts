@@ -58,15 +58,24 @@ do
         ######################################################
         containerPrjDIR="$containerTmpDIR/jianghu_entertain"
         echo "rp containerPrjDIR is $containerPrjDIR"
-        currentFile="$containerPrjDIR/$file"
-        if [ ! -f "$currentFile" ]; then
-          mkdir -p $(dirname "$currentFile")
-        fi
-        git show ${newrev}:${file} > "$currentFile"
+        mkdir -p $(dirname "$containerPrjDIR/$file")
+        # dirty hack for create dir tree
+        mkdir -p $(dirname "$TMP_DIR/source/$file")
+        git show ${newrev}:${file} > "$TMP_DIR/source/$file"
         ######################################################
-        echo "rp currentFile is $currentFile"
 #        echo "starting Cat"
-#        cat "$currentFile"
+        cat "$TMP_DIR/source/$file"
+        currentFile="$containerPrjDIR/$file"
+        echo "rp currentFile is $currentFile"
+        if [ -f "$currentFile" ]; then
+          echo "replacing file"
+          echo "file to replace is $currentFile"
+          cp "$TMP_DIR/source/$file" "$currentFile"
+          echo "content is"
+          cat $currentFile
+        else
+          cp -f "$TMP_DIR/source/$file" "$currentFile"
+        fi
     done
     #######################
     for file in ${list}; do
@@ -91,7 +100,7 @@ do
         echo "complete file is $TMP_DIR/source/$file"
         echo "now currentFile path is $currentFile"
         git show ${newrev}:${file} > "$currentFile"
-#        cat "$currentFile"
+        cat "$currentFile"
         RULESET="$containerPrjDIR/phpcs.xml"
         echo "RULESET is $RULESET";
         PHPCS_BIN="$containerPrjDIR/vendor/bin/phpcs"
@@ -116,7 +125,7 @@ do
     echo "\t\033[32mPHPCS Passed: $FILE\033[0m result"
   else
     echo "\t\033[41mPHPCS Failed: $FILE\033[0m"
-    rm -rf "$TMP_DIR" "$containerTmpDIR"
+#    rm -rf "$TMP_DIR" "$containerTmpDIR"
     exit 1
   fi
       ########Checking Stan#############
@@ -137,8 +146,8 @@ do
       echo "Code Quality Test Failed"
       #####################
 #      echo "tmpdir is $TMP_DIR and containerTmpDIR is $containerTmpDIR"
-      rm -rf "$TMP_DIR" "$containerTmpDIR"
-      exit $?
+#      rm -rf "$TMP_DIR" "$containerTmpDIR"
+#      exit $?
 #      exit 1 #temporary blocked
     fi
         #####################
@@ -146,5 +155,5 @@ do
 done
 
 # cleanup
-rm -rf "$TMP_DIR" "$containerTmpDIR"
+#rm -rf "$TMP_DIR" "$containerTmpDIR"
 exit $?
