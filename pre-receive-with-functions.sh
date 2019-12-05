@@ -158,6 +158,7 @@ function validate_php()
         echo $changed_file;
         cat $changed_file;
         projDir=$(echo $changed_file | cut -d '/' -f 1-6)
+        RULESET="$projDir/phpcs.xml"
         ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
