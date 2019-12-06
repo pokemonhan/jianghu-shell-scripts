@@ -15,6 +15,7 @@ currentdate=`date "+%Y-%m-%d"`
 scriptpath="/var/jenkins_workspace/jianghu_php"
 destination_project="$1"
 destination_branch=`echo "$2" | awk -F "/" '{printf "%s", $2}'`
+version_prefix='jianghu';
 
 # Get configuration variables
 echo "Config files is ${scriptpath}/${destination_project}.conf"
@@ -96,6 +97,22 @@ then
               php artisan route:cache;
               php artisan config:cache;
               chmod -R 777 ${destination_dir}/storage;
+              counter=0
+                while [ \$counter -lt 20 ]
+                do
+                  message=\"\$(git log -1 --skip \$counter --pretty=%B)\"
+                  if [[ \${message} == *\"Merge\"* ]]; then
+                   echo here is in merge \"\${message}\";
+                    ((counter++))
+                   else
+                   echo here is normal msg \"\${message}\";
+                      break
+                   fi
+                  echo count is \$counter and message is \$message
+                done
+              git tag -l $version_prefix-$BUILD_NUMBER
+              git tag -a -f -m '\$message' $version_prefix-$BUILD_NUMBER
+              git push --follow-tags
 else
     echo \"Nothing to do\"
 fi;\
