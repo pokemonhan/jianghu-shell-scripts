@@ -163,6 +163,7 @@ function validate_php()
         cat $changed_file;
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
         local projDir=$currentDir
+        ################# [ phpcs checking ]######################
         RULESET="$projDir/phpcs.xml"
         ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
@@ -181,6 +182,27 @@ function validate_php()
           cleanup $TMP_DIR
           error " \t\033[41mPHPCS Failed: $filename\033[0m"
         fi
+        ######################[larastan checking ]##################################
+        autoloadPath="$projDir/vendor/autoload.php"
+        neonfile="$projDir/phpstan.neon"
+        ssh -l $destination_user $destination_host \
+        -o PasswordAuthentication=no    \
+        -o StrictHostKeyChecking=no     \
+        -o UserKnownHostsFile=/dev/null \
+        -p 2225                         \
+        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+       "cd $projDir;\
+       php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;"
+       STAN_STATUS=$?
+        echo "STAN status is $STAN_STATUS"
+          if [ "$STAN_STATUS" -eq "0" ]; then
+            echo 'passed'
+          else
+            echo "$STAN_STATUS"
+            cleanup $TMP_DIR
+            error "Code Quality Test Failed"
+          fi
+        ########################################################
     else
         echo "(php is not available, check skipped.)"
         cleanup $TMP_DIR
