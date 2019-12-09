@@ -110,6 +110,7 @@ then
                    fi
                   echo count is \$counter and message is \$message
                 done
+              git tag -l | xargs git tag -d && git fetch -t;
               git tag -l $version_prefix-$BUILD_NUMBER
               git tag -a -f -m '\$message' $version_prefix-$BUILD_NUMBER
               git push --follow-tags

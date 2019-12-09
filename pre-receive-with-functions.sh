@@ -321,7 +321,6 @@ do
         git show $newrev:$filename >$currentfile
         echo "current file is $currentfile"
 		done
-		#######
 	  ###########################################################
 		for filename in $( git diff --name-only $commit^..$commit )
 		do
@@ -344,8 +343,7 @@ do
                 validate_script $extension $filename
 			fi
 		done
-		cleanup $TMP_DIR
 	done
-	cleanup $TMP_DIR
 done
+cleanup $TMP_DIR
 exit 0
