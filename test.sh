@@ -1,230 +1,345 @@
-#!/bin/sh
+#!/bin/bash
+# 1/ ensure I'm up to date, but do not fail if not
+# 2/ check tools presence
+# 3/ loop on files, and run lint tool on them
+#
+# Supported:
+# - crontabs
+# - PHP (lint + phpcs)
+# - Perl
+# - Python
 
-#check command input
-if [ "$#" -ne 2 ];
-then
-        echo "JENKINS LARAVEL PUSH"
-        echo "--------------------"
-        echo ""
-        echo "Usage : ./jenkins-laravel.sh project-name"
-        echo ""
-        exit 1
-fi
-# Declare variables
-currentdate=`date "+%Y-%m-%d"`
-scriptpath="/var/jenkins_workspace/jianghu_php"
-destination_project="$1"
-destination_branch=`echo "$2" | awk -F "/" '{printf "%s", $2}'`
 
-# Get configuration variables
-echo "Config files is ${scriptpath}/${destination_project}.conf"
-source ${scriptpath}/${destination_project}.conf
-echo "Pushing to $destination_branch .. "
 
-# Declare functions
-alert_notification() {
-    echo "Push script failure : $2" | mail -s "Push script Failure" $1
+# php coding standards
+PHPCS_STANDARD="PSR2"
+PHPCS_REPORT="diff"
+PHPCS_ENCODING="utf-8"
+
+CHKCRONTAB_GIT="https://github.com/gregorg/chkcrontab"
+CHKCRONTAB_ARGS="-w ejabberd -w ezwww -w www-data -w nobody"
+NULL_SHA1="0000000000000000000000000000000000000000" # 40 0's
+UPTODATE_RUNNED=0
+DEBUG=0
+TMP_DIR=
+
+TMPTOOLS=/tmp/check_tools
+
+#echo "RUN pre-receive hook (https://github.com/ezweb/pre-receive-hook)"
+
+
+
+function cleanup()
+{
+  TMP_DIR="$1";
+  echo "tmpdir is $TMP_DIR";
+	if [ -d "$TMP_DIR" ]
+	then
+		rm -rf "$TMP_DIR"
+	fi
 }
 
-sanity_check() {
-    if [ $1 -ne 0 ]
+
+#function tmpdir()
+#{
+#    projDir='test'
+#    if [ -z "$TMP_DIR" ]
+#    then
+#        TMP_DIR=$( mktemp -d /var/www/tmp/pre-receive-hook-XXXXX )
+#        cp -rf /var/www/$projDir $TMP_DIR
+#    fi
+#}
+#
+#
+#function create_changed_file()
+#{
+#    local projDir='test'
+#    file="$1"
+#    short_file_name=$( basename $file )
+#    tmpdir
+#    git show $newrev:$file >$TMP_DIR/$projDir/$short_file_name
+#    echo "$TMP_DIR/$projDir/$short_file_name"
+#}
+
+
+function error()
+{
+    echo ""
+    echo -e "\033[31m ================================================================ \033[0m"
+    echo -e "\033[31m =                         错误  !!!                           = \033[0m"
+    echo -e "\033[31m ================================================================ \033[0m"
+    echo ""
+    echo -e "\033[31m ERROR: $@ \033[0m"
+    echo ""
+#    cleanup
+    exit 3
+}
+
+
+function warn()
+{
+    echo ""
+    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
+    echo -e "\033[1;31m\033[43m =                        WARNING !!!                           = \033[0m"
+    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
+    echo ""
+    echo -e "\033[1;31m\033[43m >>> $@ \033[0m"
+    echo ""
+}
+
+
+function debug()
+{
+    if [ $DEBUG -gt 0 ]
     then
-        echo "$2"
-        alert_notification $alert_email "$2"
-        exit 1
+        echo "(debug: $@)"
     fi
 }
-echo
-##################################################################################
-destination_user="$dest_user_staging"
-destination_host="$dest_host_staging" #$dest_host_staging　
-destination_dir="$dest_dir_staging"
-gitlabip="172.19.0.14" # 172.22.0.1　9170ttt.com
-##################################################################################
-case $Status  in
-  Deploy)
-    echo "Status:$Status"
-    ##################################################################
-      ################
-      # STAGING PUSH #
-      ################
-      if [ "$destination_branch" == "master" ]
-      then
-          # Push command over ssh
-          ssh -l $destination_user $destination_host \
-              -o PasswordAuthentication=no    \
-              -o StrictHostKeyChecking=no     \
-              -o UserKnownHostsFile=/dev/null \
-              -p 2226                         \
-              -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
-             "cd $destination_dir;\
-             rm -rf composer.lock;\
-              git reset --hard;\
-              git fetch --all;\
-              git checkout -f $destination_branch;\
-              git reset --hard;\
-              git fetch --all;\
-              git pull origin $destination_branch;\
-              /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
-              php artisan clear-compiled;\
-              php artisan cache:clear;\
-              php artisan route:cache;\
-              php artisan config:cache;\
-              chmod -R 777 ${destination_dir}/storage;"
-              #chmod -R 775 ${destination_dir};\
-              #php artisan config:cache;"
-              #php artisan migrate --force;\
-              #php artisan queue:restart;\
-              #npm i;\
-              #npm run dev;\
-              #php artisan config:clear;\
-              #/usr/bin/php ./vendor/bin/phpunit --log-junit ${destination_dir}/tests/results/${destination_project}_test1.xml"
 
-          # Get test results
-      #    ssh -l $destination_user $destination_host \
-      #        -o PasswordAuthentication=no    \
-      #        -o StrictHostKeyChecking=no     \
-      #        -o UserKnownHostsFile=/dev/null \
-      #        -p 2226                         \
-      #        -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
-      #        "cat ${destination_dir}/tests/results/${destination_project}_test1.xml" > ${item_rootdir}/tests/results/${destination_project}_test1.xml
 
-      echo "Completing Build!"
-      ###################
-      # PRODUCTION PUSH # production
-      ###################
-      elif [ "$destination_branch" == "production" ]
-      then
-          destination_user="$dest_user_prod"
-          destination_host="$dest_host_prod"
-          destination_dir="$dest_dir_prod"
-          pre_prod_dir="$pre_prod"
-          # Prep the api doc gen command for production only
-          if [ "$gen_docs_prod" == "TRUE" ]
-          then
-              gen_docs_cmd="php ${gen_docs_proddir}/vendor/bin/apigen generate --source=${destination_dir}/app --destination=${gen_docs_proddir}/public/api --template-theme=bootstrap --title=\"SFS Developer Docs\" -q --tree"
+#function validate_crontab()
+#{
+#    local CHKCRONTAB=/usr/local/chkcrontab/chkcrontabb
+#    # check tool presence...
+#    if [ ! -x $CHKCRONTAB ]
+#    then
+#        if [ -x $TMPTOOLS/chkcrontab/chkcrontab ]
+#        then
+#            CHKCRONTAB=$TMPTOOLS/chkcrontab/chkcrontab
+#            # ensure up-to-date
+#            debug "ensure chkcrontab is up to date in $TMPTOOLS/chkcrontab"
+#            # in a sub-shell
+#            (
+#                cd $TMPTOOLS/chkcrontab
+#                unset GIT_DIR
+#                git pull -q origin
+#            )
+#        else
+#            echo "Install tool chkcrontab ..."
+#            if git clone -q $CHKCRONTAB_GIT $TMPTOOLS/chkcrontab
+#            then
+#                CHKCRONTAB=$TMPTOOLS/chkcrontab/chkcrontab
+#            fi
+#        fi
+#    fi
+#
+#    if [ ! -x $CHKCRONTAB ]
+#    then
+#        echo "(warning: crontab linter does not exists. Check skipped.)"
+#        return 0
+#    fi
+#
+#    local changed_file=$( create_changed_file "$1" )
+#    if ! $CHKCRONTAB $CHKCRONTAB_ARGS $changed_file
+#    then
+#        if ! $CHKCRONTAB $CHKCRONTAB_ARGS -u $changed_file
+#        then
+#            error "$filename doesn't pass crontab check."
+#        fi
+#    fi
+#}
+
+
+function validate_php()
+{
+  currentfile="$1"
+  currentDir="$2"
+  local TMP_DIR="$3"
+  local destination_user="$4"
+  local destination_host="$5"
+  echo "currentfile is $currentfile and currentDir is $currentDir and tmpdir is $TMP_DIR"
+  php=$(ssh -l $destination_user $destination_host \
+        -o PasswordAuthentication=no    \
+        -o StrictHostKeyChecking=no     \
+        -o UserKnownHostsFile=/dev/null \
+        -p 2225                         \
+        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+       "/usr/bin/php");
+    if [ -x $php ]
+    then
+        local changed_file="$1"
+        echo $changed_file;
+        cat $changed_file;
+#        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
+        local projDir=$currentDir
+        ################# [ phpcs checking ]######################
+        RULESET="$projDir/phpcs.xml"
+        ssh -l $destination_user $destination_host \
+        -o PasswordAuthentication=no    \
+        -o StrictHostKeyChecking=no     \
+        -o UserKnownHostsFile=/dev/null \
+        -p 2225                         \
+        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+       "cd $projDir/vendor/bin;\
+./phpcs --standard=$RULESET $changed_file"
+        EXIT_STATUS=$?
+        echo "exist status is $EXIT_STATUS"
+        if [ "$EXIT_STATUS" -eq "0" ]; then
+#          cleanup
+          echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
+        else
+          cleanup $TMP_DIR
+          error " \t\033[41mPHPCS Failed: $filename\033[0m"
+        fi
+        ######################[larastan checking ]##################################
+        autoloadPath="$projDir/vendor/autoload.php"
+        neonfile="$projDir/phpstan.neon"
+        ssh -l $destination_user $destination_host \
+        -o PasswordAuthentication=no    \
+        -o StrictHostKeyChecking=no     \
+        -o UserKnownHostsFile=/dev/null \
+        -p 2225                         \
+        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+       "cd $projDir;\
+       php artisan code:analyse --error-format=prettyJson --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;"
+       STAN_STATUS=$?
+        echo "STAN status is $STAN_STATUS"
+          if [ "$STAN_STATUS" -eq "0" ]; then
+            echo 'passed'
           else
-              gen_docs_cmd="whoami"
+            echo "$STAN_STATUS"
+            cleanup $TMP_DIR
+            error "Code Quality Test Failed"
           fi
+        ########################################################
+    else
+        echo "(php is not available, check skipped.)"
+        cleanup $TMP_DIR
+        return 0
+    fi
 
-          # Get current latest commit running on prod
-          ssh -l $destination_user $destination_host "cd $destination_dir;git fetch --all"
-          current_local_commit=`ssh -l $destination_user $destination_host "cd $destination_dir;git rev-parse --short HEAD"`
-          current_remote_commit=`ssh -l $destination_user $destination_host "cd $destination_dir;git rev-parse --short origin/${destination_branch} "`
+    #PHPCS=$TMPTOOLS/phpcs.phar
+    #if [ ! -e $PHPCS ]
+    #then
+    #    debug "Fetch phpcs ..."
+    #    curl -so $PHPCS -L https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
+    #fi
+    #if [ -e $PHPCS ]
+    #then
+    #    debug "run phpcs ..."
+    #    if ! php $PHPCS -n --colors --encoding=${PHPCS_ENCODING} --report=${PHPCS_REPORT} --standard=${PHPCS_STANDARD} $changed_file
+    #    then
+    #        # still some works to do, do not report an error, yet...
+    #        warn "PHPCS check doesn't pass."
+    #    fi
+    #else
+    #    echo "(phpCS is not available, check skipped.)"
+    #fi
+}
 
-          # Make sure local and remote arent the same because then theres no reason to push
-          if [ "$current_local_commit" == "$current_remote_commit" ]
-          then
-              alert_msg="Remote HEAD : $current_remote_commit matches Local HEAD : $current_local_commit, exiting..."
-              echo "$alert_msg"
-              alert_notification $alert_email "$alert_msg"
-              exit 1
-          fi
 
-          echo "Commit currently running on production : $current_local_commit"
-          echo "Commit currently on remote : $current_remote_commit"
+function validate_script()
+{
+    local checker=
+    local checker_opts=
+    local changed_file=$( create_changed_file "$2" )
+    if [ "$1" = "pl" ]
+    then
+        checker=perl
+        checker_opts="-c"
+    elif [ "$1" = "py" ]
+    then
+        checker=python3
+        checker_opts="-m py_compile"
+    fi
 
-          # Prep the pre prod folder
-          check_clear_folder=`ssh -l $destination_user $destination_host "rm -rf $pre_prod_dir"`
-          sanity_check $? "Error with cleaning pre prod folder : $check_clear_folder"
+    if ! which $checker >/dev/null
+    then
+        echo "($checker is not available, check skipped.)"
+        return 0
+    fi
 
-          # Clone files from the repo in prod prep folder, set permissions and rsync files from live site
-          ssh -l $destination_user $destination_host \
-              "mkdir $pre_prod_dir &&\
-              cd $pre_prod_dir &&\
-              git clone $git_repo . &&\
-              rsync --ignore-existing -razp --progress --exclude '.git' --exclude '.npm' --exclude 'node_modules' --exclude 'vendor' --exclude '.cache' ${destination_dir}/ ${pre_prod_dir} &&\
-              chown -R ${user_perm}:${group_perm} ${pre_prod_dir}"
+    if ! eval "$checker $checker_opts \"$changed_file\""
+    then
+        error "$filename doesn't pass $checker syntax check."
+    fi
+}
 
-          # Sanity checks
-          check_composer_install=`ssh -l $destination_user $destination_host "cd $pre_prod_dir;/usr/local/bin/composer install --no-interaction --prefer-dist --optimize-autoloader"`
-          sanity_check $? "Error with composer update on production : $check_composer_install"
 
-          # Sanity checks before actually pushing live
-          check_npm_install=`ssh -l $destination_user $destination_host "cd $pre_prod_dir;npm i"`
-          sanity_check $? "Error with NPM install pacakge on production : $check_npm_install"
+function get_extension()
+{
+    file="$( basename $1 )"
+    echo ${file##*.}
+}
 
-          check_npm_run=`ssh -l $destination_user $destination_host "cd $pre_prod_dir;npm run dev"`
-          sanity_check $? "Error with NPM run dev on production : $check_npm_run"
 
-          check_move_preprod=`ssh -l $destination_user $destination_host "mv $pre_prod_dir ${destination_dir}_${current_remote_commit}"`
-          sanity_check $? "Error with moving pre-prod folder to cluster folder : $check_move_preprod"
+trap "cleanup" INT QUIT TERM TSTP EXIT
 
-          ssh -l $destination_user $destination_host \
-              "cd ${destination_dir}_${current_remote_commit};\
-              $gen_docs_cmd;\
-              php artisan clear-compiled;\
-              php artisan cache:clear;\
-              php artisan route:clear;\
-              php artisan route:cache;\
-              php artisan view:clear;\
-              php artisan config:clear;\
-              php artisan config:cache"
+# Run loop as soon as possible, to ensure this is this loop that will handle stdin
+while read oldrev newrev ref
+do
+  ####################[Checkout current Branch]########################################
+  destination_user="root"
+  destination_host="172.19.0.1"
+  projDir='test'
+  TMP_DIR=$( mktemp -d /var/www/tmp/pre-receive-hook-XXXXX )
+  currentDir=$TMP_DIR/$projDir
+  echo commit is $commit;
+  echo "starting copy /var/www/$projDir to $TMP_DIR";
+  cp -rf /var/www/$projDir $TMP_DIR
+  echo "$ref : $oldrev ~ $newrev"
+  current_branch=$(echo $ref | cut -d '/' -f 3)
+  echo "current_branch name is $current_branch"
+  # shellcheck disable=SC2095
+  ssh -l $destination_user $destination_host \
+      -o PasswordAuthentication=no    \
+      -o StrictHostKeyChecking=no     \
+      -o UserKnownHostsFile=/dev/null \
+      -p 2225                         \
+      -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+     "cd $currentDir;\
+     git reset --hard;\
+     git checkout -b $current_branch origin/$current_branch --;\
+     git fetch --all;\
+     git branch;\
+     "
+  ###########################################################
+	# in a sub-shell ...
 
-          check_force_symlink=`ssh -l $destination_user $destination_host "ln -sf ${destination_dir}_${current_remote_commit} ${$destination_dir}"`
-          sanity_check $? "Error with creating symlink to newly pushed folder : $check_force_symlink"
+	invalids=0
+    test -d $TMPTOOLS || mkdir -p $TMPTOOLS
 
-          # Remove all folders except the current and previous commit folders as well as the symlink
-          ssh -l $destination_user $destination_host \
-              "find ${dest_dir_root} -type d -not \( -name '${destination_dir}' -or -name '${destination_dir}_{$current_remote_commit}' -or -name '${destination_dir}_${current_local_commit}' \) -delete"
+    # ugly hook that works in this specific case...
+    if [ "$oldrev" = "$NULL_SHA1" ]
+    then
+        oldrev="$newrev^"
+    fi
 
-          # We dont run unit tests on production
-          echo "" > ${item_rootdir}/tests/results/${destination_project}_test1.xml
-          echo "" > ${item_rootdir}/tests/results/${destination_project}_test2.xml
+	for commit in $( git rev-list ${oldrev}..${newrev} )
+	do
+	  for filename in $( git diff --name-only $commit^..$commit )
+		do
+		    echo file name is $filename;
+		    currentfile=$TMP_DIR/$projDir/$filename
+		    mkdir -p $(dirname "$currentfile")
+        git show $newrev:$filename >$currentfile
+        echo "current file is $currentfile"
+		done
+		#######
+	  ###########################################################
+		for filename in $( git diff --name-only $commit^..$commit )
+		do
+			# TODO: if not a file, continue...
 
-      else
-          echo "Invalid branch provided : $destination_branch"
-          exit 1
-      fi
-    ##################################################################
-    ;;
-  Rollback)
-      echo "Status:$Status"
-      echo "Version:$Version to be starting to Rollback"
-      if [ "$destination_branch" == "master" ]
-      then
-          # Push command over ssh
-          # git push -f
-          # git reset --hard "jianghu-5"
-          # grep 'at' <<< "HEAD is now at a3cc6ba hello1" | sed 's/^.*at //'
-          # git commit -m "版本回滚到 jianghu-5"
-          # git log -1 --pretty=%B #final first commit message
-          #########
-          ssh -l $destination_user $destination_host \
-              -o PasswordAuthentication=no    \
-              -o StrictHostKeyChecking=no     \
-              -o UserKnownHostsFile=/dev/null \
-              -p 2226                         \
-              -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
-             "cd $destination_dir;\
-              rm -rf composer.lock;\
-              if git rev-parse ${Version} >/dev/null 2>&1
-then
-      echo \"Found tag\"
-      reSetedFullMsg=\$(git reset --hard ${Version});
-      echo \"reSetedFullMsg is \$reSetedFullMsg\";
-      reSetedMsg=\$(grep 'at' <<< \$reSetedFullMsg | sed 's/^.*at //');
-      echo reSetedMsg is \$reSetedMsg;
-      git reset --soft HEAD@{1};
-      git commit -m \"版本回滚到 ${Version} \$reSetedMsg \";
-      git push origin master;
-      /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
-      php artisan clear-compiled;
-      php artisan cache:clear;
-      php artisan route:cache;
-      php artisan config:cache;
-      chmod -R 777 ${destination_dir}/storage;
-else
-    echo \"Tag not found\" !!!!!!!!!!!!!!!!!!!!!!
-fi;"
-    echo "Completing Rollback!"
-      else
-          echo "Invalid branch provided : $destination_branch to Rollback"
-          exit 1
-      fi
-      ;;
-  *)
-  exit
-      ;;
-esac
-##################################################################################
+      extension="$( get_extension $filename )"
+#			if grep -F /crontab <<< "$filename"
+#			    then
+#                validate_crontab $filename
+#            elif [ "$extension" = "php" ]
+            if [ "$extension" = "php" ]
+            then
+               echo vd file name is $filename;
+		           currentfile=$TMP_DIR/$projDir/$filename
+		           echo "vd current file is $currentfile"
+		           echo "ready to validate php"
+                validate_php $currentfile $currentDir $TMP_DIR $destination_user $destination_host
+            elif [ "$extension" = "pl" ] || [ "$extension" = "py" ]
+            then
+                validate_script $extension $filename
+			fi
+		done
+		cleanup $TMP_DIR
+	done
+	cleanup $TMP_DIR
+done
+exit 0

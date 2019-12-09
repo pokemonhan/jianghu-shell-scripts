@@ -35,7 +35,12 @@ function cleanup()
   echo "tmpdir is $TMP_DIR";
 	if [ -d "$TMP_DIR" ]
 	then
-		rm -rf "$TMP_DIR"
+#	   OWNER=`ls -ld $TMP_DIR | cut --delimiter=" " --fields="3"`
+#     GROUP=`ls -ld $TMP_DIR | cut --delimiter=" " --fields="4"`
+#     echo $OWNER:$GROUP
+#     chown -R $OWNER:$GROUP $TMP_DIR/*;
+#     chmod -R 777 $TMP_DIR;
+		 rm -rf "$TMP_DIR"
 	fi
 }
 
@@ -145,10 +150,9 @@ function validate_php()
   currentfile="$1"
   currentDir="$2"
   local TMP_DIR="$3"
-  destination_dir=$currentDir
-  echo "currentfile is $currentfile and currentDir is $currentDir and tmpdir is $TMP_DIR and destination_dir is $destination_dir"
-  destination_user="root"
-  destination_host="172.19.0.1"
+  local destination_user="$4"
+  local destination_host="$5"
+  echo "currentfile is $currentfile and currentDir is $currentDir and tmpdir is $TMP_DIR"
   php=$(ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
@@ -269,6 +273,33 @@ trap "cleanup" INT QUIT TERM TSTP EXIT
 # Run loop as soon as possible, to ensure this is this loop that will handle stdin
 while read oldrev newrev ref
 do
+  ####################[Checkout current Branch]########################################
+  destination_user="root"
+  destination_host="172.19.0.1"
+  projDir='jianghu_entertain'
+  TMP_DIR=$( mktemp -d /var/www/tmp/pre-receive-hook-XXXXX )
+  currentDir=$TMP_DIR/$projDir
+  echo commit is $commit;
+  echo "starting copy /var/www/$projDir to $TMP_DIR";
+  cp -rf /var/www/$projDir $TMP_DIR
+  echo "$ref : $oldrev ~ $newrev"
+  current_branch=$(echo $ref | cut -d '/' -f 3)
+  echo "current_branch name is $current_branch"
+  # shellcheck disable=SC2095
+  ssh -l $destination_user $destination_host \
+      -o PasswordAuthentication=no    \
+      -o StrictHostKeyChecking=no     \
+      -o UserKnownHostsFile=/dev/null \
+      -p 2225                         \
+      -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+     "cd $currentDir;\
+     git reset --hard;\
+     git checkout -b $current_branch origin/$current_branch --;\
+     git fetch --all;\
+     git branch;\
+     chmod -R 777 $currentDir;\
+     "
+  ###########################################################
 	# in a sub-shell ...
 
 	invalids=0
@@ -282,13 +313,6 @@ do
 
 	for commit in $( git rev-list ${oldrev}..${newrev} )
 	do
-	  ############################################################
-	  projDir='jianghu_entertain'
-	  TMP_DIR=$( mktemp -d /var/www/tmp/pre-receive-hook-XXXXX )
-	  currentDir=$TMP_DIR/$projDir
-	  echo commit is $commit;
-	  echo "starting copy /var/www/$projDir to $TMP_DIR";
-    cp -rf /var/www/$projDir $TMP_DIR
 	  for filename in $( git diff --name-only $commit^..$commit )
 		do
 		    echo file name is $filename;
@@ -314,7 +338,7 @@ do
 		           currentfile=$TMP_DIR/$projDir/$filename
 		           echo "vd current file is $currentfile"
 		           echo "ready to validate php"
-                validate_php $currentfile $currentDir $TMP_DIR
+                validate_php $currentfile $currentDir $TMP_DIR $destination_user $destination_host
             elif [ "$extension" = "pl" ] || [ "$extension" = "py" ]
             then
                 validate_script $extension $filename
@@ -322,5 +346,6 @@ do
 		done
 		cleanup $TMP_DIR
 	done
+	cleanup $TMP_DIR
 done
 exit 0
