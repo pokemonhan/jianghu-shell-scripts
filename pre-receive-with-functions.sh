@@ -27,7 +27,11 @@ TMPTOOLS=/tmp/check_tools
 
 #echo "RUN pre-receive hook (https://github.com/ezweb/pre-receive-hook)"
 
-
+#	   OWNER=`ls -ld $TMP_DIR | cut --delimiter=" " --fields="3"`
+#     GROUP=`ls -ld $TMP_DIR | cut --delimiter=" " --fields="4"`
+#     echo $OWNER:$GROUP
+#     chown -R $OWNER:$GROUP $TMP_DIR/*;
+#     chmod -R 777 $TMP_DIR;
 
 function cleanup()
 {
@@ -35,11 +39,6 @@ function cleanup()
   echo "tmpdir is $TMP_DIR";
 	if [ -d "$TMP_DIR" ]
 	then
-#	   OWNER=`ls -ld $TMP_DIR | cut --delimiter=" " --fields="3"`
-#     GROUP=`ls -ld $TMP_DIR | cut --delimiter=" " --fields="4"`
-#     echo $OWNER:$GROUP
-#     chown -R $OWNER:$GROUP $TMP_DIR/*;
-#     chmod -R 777 $TMP_DIR;
 		 rm -rf "$TMP_DIR"
 	fi
 }
@@ -310,18 +309,20 @@ do
     then
         oldrev="$newrev^"
     fi
-
 	for commit in $( git rev-list ${oldrev}..${newrev} )
 	do
 	  for filename in $( git diff --name-only $commit^..$commit )
 		do
 		    echo file name is $filename;
-		    currentfile=$TMP_DIR/$projDir/$filename
+		    currentfile=$currentDir/$filename
 		    mkdir -p $(dirname "$currentfile")
         git show $newrev:$filename >$currentfile
         echo "current file is $currentfile"
 		done
-	  ###########################################################
+	done
+	#############################################
+	for commit in $( git rev-list ${oldrev}..${newrev} )
+	do
 		for filename in $( git diff --name-only $commit^..$commit )
 		do
 			# TODO: if not a file, continue...
@@ -334,7 +335,7 @@ do
             if [ "$extension" = "php" ]
             then
                echo vd file name is $filename;
-		           currentfile=$TMP_DIR/$projDir/$filename
+		           currentfile=$currentDir/$filename
 		           echo "vd current file is $currentfile"
 		           echo "ready to validate php"
                 validate_php $currentfile $currentDir $TMP_DIR $destination_user $destination_host
@@ -344,6 +345,7 @@ do
 			fi
 		done
 	done
+	############################################
 done
 cleanup $TMP_DIR
 exit 0
