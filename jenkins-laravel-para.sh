@@ -82,7 +82,7 @@ case $Status  in
                 echo \"LOCAL is \$LOCAL\";\
               REMOTE=\$(git ls-remote \$(git rev-parse --abbrev-ref @{u} | \sed 's/\// /g') | cut -f1);\
                 echo \"REMOTE is \$REMOTE\";\
-              if [ \$LOCAL != \$REMOTE ]
+              if [ \$LOCAL != \$REMOTE ] || [ -z \$REMOTE ]
 then
               rm -rf composer.lock;
               git reset --hard;
@@ -115,7 +115,7 @@ then
               git tag -a -f -m '\$message' $version_prefix-$BUILD_NUMBER
               git push --follow-tags;
 else
-    echo \"Nothing to do\"
+    echo \"Nothing to do\";
 fi;\
               "
               #chmod -R 775 ${destination_dir};\
