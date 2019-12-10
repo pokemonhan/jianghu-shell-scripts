@@ -282,7 +282,7 @@ do
   echo "starting copy /var/www/$projDir to $TMP_DIR";
   cp -rf /var/www/$projDir $TMP_DIR
   echo "$ref : $oldrev ~ $newrev"
-  current_branch=$(echo $ref | cut -d '/' -f 3)
+  current_branch=$(echo $ref | cut -d '/' -f 3-)
   echo "current_branch name is $current_branch"
   # shellcheck disable=SC2095
   ssh -l $destination_user $destination_host \
@@ -293,8 +293,10 @@ do
       -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
      "cd $currentDir;\
      git reset --hard;\
-     git checkout -b $current_branch origin/$current_branch --;\
+     git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout -b $current_branch origin/$current_branch --;\
+     git reset --hard;\
      git fetch --all;\
+     git pull origin $current_branch;
      git branch;\
      chmod -R 777 $currentDir;\
      "
