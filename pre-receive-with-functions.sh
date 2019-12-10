@@ -316,8 +316,12 @@ do
 	  for filename in $( git diff --name-only $commit^..$commit )
 		do
 		    echo file name is $filename;
-		    currentfile=$currentDir/$filename
-#		    mkdir -m 777 -p "$currentfile.txt"
+		    currentfile="$currentDir/$filename"
+		    mkdir -m 777 -p $(dirname "$currentfile")
+        if [ ! -f "$currentfile" ]; then
+             touch "$currentfile";
+            echo "does not exist so created $currentfile"
+        fi
         git show $newrev:$filename > "$currentfile"
 #        rm -f $currentfile
 #        mv "$currentfile.txt" "$currentfile"
