@@ -91,6 +91,7 @@ then
               git reset --hard;
               git fetch --all;
               git pull origin $destination_branch;
+              git tag -l | xargs git tag -d && git fetch -t;
               /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;
               php artisan clear-compiled;
               php artisan cache:clear;
@@ -110,10 +111,9 @@ then
                    fi
                   echo count is \$counter and message is \$message
                 done
-              git tag -l | xargs git tag -d && git fetch -t;
               git tag -l $version_prefix-$BUILD_NUMBER
               git tag -a -f -m '\$message' $version_prefix-$BUILD_NUMBER
-              git push --follow-tags
+              git push --follow-tags;
 else
     echo \"Nothing to do\"
 fi;\
