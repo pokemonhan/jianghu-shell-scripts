@@ -317,9 +317,12 @@ do
 		do
 		    echo file name is $filename;
 		    currentfile=$currentDir/$filename
-		    mkdir -p $(dirname "$currentfile")
-        git show $newrev:$filename >$currentfile
+#		    mkdir -m 777 -p "$currentfile.txt"
+        git show $newrev:$filename > "$currentfile"
+#        rm -f $currentfile
+#        mv "$currentfile.txt" "$currentfile"
         echo "current file is $currentfile"
+#        cat $currentfile;
 		done
 	done
 	#############################################
