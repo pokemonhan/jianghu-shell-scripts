@@ -162,8 +162,8 @@ function validate_php()
     if [ -x $php ]
     then
         local changed_file="$1"
-        echo $changed_file;
-        cat $changed_file;
+#        echo $changed_file;
+#        cat $changed_file;
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
         local projDir=$currentDir
         ################# [ phpcs checking ]######################
@@ -315,7 +315,7 @@ do
 	do
 	  for filename in $( git diff --name-only $commit^..$commit )
 		do
-		    echo file name is $filename;
+#		    echo file name is $filename;
 		    currentfile="$currentDir/$filename"
 		    mkdir -m 777 -p $(dirname "$currentfile")
         if [ ! -f "$currentfile" ]; then
@@ -343,9 +343,9 @@ do
 #            elif [ "$extension" = "php" ]
             if [ "$extension" = "php" ]
             then
-               echo vd file name is $filename;
+#               echo vd file name is $filename;
 		           currentfile=$currentDir/$filename
-		           echo "vd current file is $currentfile"
+#		           echo "vd current file is $currentfile"
 		           echo "ready to validate php"
                 validate_php $currentfile $currentDir $TMP_DIR $destination_user $destination_host
             elif [ "$extension" = "pl" ] || [ "$extension" = "py" ]
