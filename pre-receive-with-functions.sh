@@ -68,7 +68,8 @@ function cleanup()
 
 function error()
 {
-    echo ""
+    (($errorStatus++))
+    echo "error status is $errorStatus"
     echo -e "\033[31m ================================================================ \033[0m"
     echo -e "\033[31m =                         错误  !!!                           = \033[0m"
     echo -e "\033[31m ================================================================ \033[0m"
@@ -97,6 +98,16 @@ function debug()
     if [ $DEBUG -gt 0 ]
     then
         echo "(debug: $@)"
+    fi
+}
+
+function checkError()
+{
+  echo "now errorStatus is $errorStatus";
+    if [ $errorStatus -gt 0 ]
+    then
+      echo "error has occured"
+        exist 1;
     fi
 }
 
@@ -146,8 +157,9 @@ function debug()
 
 function validate_php()
 {
-  currentfile="$1"
-  currentDir="$2"
+  checkError
+  local currentfile="$1"
+  local currentDir="$2"
   local TMP_DIR="$3"
   local destination_user="$4"
   local destination_host="$5"
@@ -162,8 +174,8 @@ function validate_php()
     if [ -x $php ]
     then
         local changed_file="$1"
-#        echo $changed_file;
-#        cat $changed_file;
+        echo $changed_file;
+        cat $changed_file;
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
         local projDir=$currentDir
         ################# [ phpcs checking ]######################
@@ -179,7 +191,6 @@ function validate_php()
         EXIT_STATUS=$?
         echo "exist status is $EXIT_STATUS"
         if [ "$EXIT_STATUS" -eq "0" ]; then
-#          cleanup
           echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
         else
           cleanup $TMP_DIR
@@ -207,9 +218,8 @@ function validate_php()
           fi
         ########################################################
     else
-        echo "(php is not available, check skipped.)"
         cleanup $TMP_DIR
-        return 0
+        error "(php is not available, check skipped.)"
     fi
 
     #PHPCS=$TMPTOOLS/phpcs.phar
@@ -266,6 +276,52 @@ function get_extension()
     echo ${file##*.}
 }
 
+function writefile() {
+  local newrev="$1"
+  local filename="$2"
+  local currentDir="$3"
+  local currentfile="$currentDir/$filename"
+    #		    echo file name is $filename;
+		    mkdir -m 777 -p $(dirname "$currentfile")
+        if [ ! -f "$currentfile" ]; then
+             touch "$currentfile";
+            echo "does not exist so created $currentfile"
+        fi
+        git show $newrev:$filename > "$currentfile"
+#        rm -f $currentfile
+#        mv "$currentfile.txt" "$currentfile"
+        echo "current file is $currentfile"
+#        cat $currentfile;
+}
+
+function fileAnalysis() {
+  checkError
+  local filename="$1"
+  local currentDir="$2"
+  local TMP_DIR="$3"
+  local destination_user="$4"
+  local destination_host="$5"
+
+    # TODO: if not a file, continue...
+
+      extension="$( get_extension $filename )"
+#			if grep -F /crontab <<< "$filename"
+#			    then
+#                validate_crontab $filename
+#            elif [ "$extension" = "php" ]
+            if [ "$extension" = "php" ]
+            then
+#               echo vd file name is $filename;
+		           local currentfile=$currentDir/$filename
+#		           echo "vd current file is $currentfile"
+		           echo "ready to validate php"
+                validate_php "$currentfile" "$currentDir" "$TMP_DIR" "$destination_user" "$destination_host"
+            elif [ "$extension" = "pl" ] || [ "$extension" = "py" ]
+            then
+                validate_script $extension $filename
+			      fi
+}
+
 
 trap "cleanup" INT QUIT TERM TSTP EXIT
 
@@ -273,6 +329,7 @@ trap "cleanup" INT QUIT TERM TSTP EXIT
 while read oldrev newrev ref
 do
   ####################[Checkout current Branch]########################################
+  errorStatus=0
   destination_user="root"
   destination_host="172.19.0.1"
   projDir='jianghu_entertain'
@@ -315,18 +372,9 @@ do
 	do
 	  for filename in $( git diff --name-only $commit^..$commit )
 		do
-#		    echo file name is $filename;
-		    currentfile="$currentDir/$filename"
-		    mkdir -m 777 -p $(dirname "$currentfile")
-        if [ ! -f "$currentfile" ]; then
-             touch "$currentfile";
-            echo "does not exist so created $currentfile"
-        fi
-        git show $newrev:$filename > "$currentfile"
-#        rm -f $currentfile
-#        mv "$currentfile.txt" "$currentfile"
-        echo "current file is $currentfile"
-#        cat $currentfile;
+		  ##############[parallel writing files ]#############
+		  writefile "$newrev" "$filename" "$currentDir" &
+		  ####################################################
 		done
 	done
 	#############################################
@@ -334,24 +382,9 @@ do
 	do
 		for filename in $( git diff --name-only $commit^..$commit )
 		do
-			# TODO: if not a file, continue...
-
-      extension="$( get_extension $filename )"
-#			if grep -F /crontab <<< "$filename"
-#			    then
-#                validate_crontab $filename
-#            elif [ "$extension" = "php" ]
-            if [ "$extension" = "php" ]
-            then
-#               echo vd file name is $filename;
-		           currentfile=$currentDir/$filename
-#		           echo "vd current file is $currentfile"
-		           echo "ready to validate php"
-                validate_php $currentfile $currentDir $TMP_DIR $destination_user $destination_host
-            elif [ "$extension" = "pl" ] || [ "$extension" = "py" ]
-            then
-                validate_script $extension $filename
-			fi
+		 ################################[parallel analyzing files ]###################################
+		 fileAnalysis "$filename" "$currentDir" "$TMP_DIR" "$destination_user" "$destination_host"
+		 #############################################################################################
 		done
 	done
 	############################################
