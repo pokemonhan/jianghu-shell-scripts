@@ -25,6 +25,11 @@ TMP_DIR=
 
 TMPTOOLS=/tmp/check_tools
 
+errorStatus=0
+destination_user="root"
+destination_host="172.19.0.1"
+projDir='jianghu_entertain'
+
 #echo "RUN pre-receive hook (https://github.com/ezweb/pre-receive-hook)"
 
 #	   OWNER=`ls -ld $TMP_DIR | cut --delimiter=" " --fields="3"`
@@ -68,29 +73,31 @@ function cleanup()
 
 function error()
 {
-    (($errorStatus++))
-    echo "error status is $errorStatus"
+#  echo "before errorStatus is $errorStatus"
+#  errorStatus=$((errorStatus+1))
+#  echo "after errorStatus is $errorStatus"
+#    (($errorStatus++))
+#    echo "error status is $errorStatus"
     echo -e "\033[31m ================================================================ \033[0m"
     echo -e "\033[31m =                         错误  !!!                           = \033[0m"
     echo -e "\033[31m ================================================================ \033[0m"
     echo ""
     echo -e "\033[31m ERROR: $@ \033[0m"
     echo ""
-#    cleanup
     exit 3
 }
 
 
-function warn()
-{
-    echo ""
-    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
-    echo -e "\033[1;31m\033[43m =                        WARNING !!!                           = \033[0m"
-    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
-    echo ""
-    echo -e "\033[1;31m\033[43m >>> $@ \033[0m"
-    echo ""
-}
+#function warn()
+#{
+#    echo ""
+#    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
+#    echo -e "\033[1;31m\033[43m =                        WARNING !!!                           = \033[0m"
+#    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
+#    echo ""
+#    echo -e "\033[1;31m\033[43m >>> $@ \033[0m"
+#    echo ""
+#}
 
 
 function debug()
@@ -157,7 +164,6 @@ function checkError()
 
 function validate_php()
 {
-  checkError
   local currentfile="$1"
   local currentDir="$2"
   local TMP_DIR="$3"
@@ -180,7 +186,8 @@ function validate_php()
         local projDir=$currentDir
         ################# [ phpcs checking ]######################
         RULESET="$projDir/phpcs.xml"
-        ssh -l $destination_user $destination_host \
+        if [ -d "$projDir" ]; then
+             ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
         -o UserKnownHostsFile=/dev/null \
@@ -193,7 +200,7 @@ function validate_php()
         if [ "$EXIT_STATUS" -eq "0" ]; then
           echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
         else
-          cleanup $TMP_DIR
+#          cleanup $TMP_DIR
           error " \t\033[41mPHPCS Failed: $filename\033[0m"
         fi
         ######################[larastan checking ]##################################
@@ -213,12 +220,14 @@ function validate_php()
             echo 'passed'
           else
             echo "$STAN_STATUS"
-            cleanup $TMP_DIR
+#            cleanup $TMP_DIR
             error "Code Quality Test Failed"
           fi
+        else
+          error "folder already remove due to error"
+        fi
         ########################################################
     else
-        cleanup $TMP_DIR
         error "(php is not available, check skipped.)"
     fi
 
@@ -242,32 +251,32 @@ function validate_php()
 }
 
 
-function validate_script()
-{
-    local checker=
-    local checker_opts=
-    local changed_file=$( create_changed_file "$2" )
-    if [ "$1" = "pl" ]
-    then
-        checker=perl
-        checker_opts="-c"
-    elif [ "$1" = "py" ]
-    then
-        checker=python3
-        checker_opts="-m py_compile"
-    fi
-
-    if ! which $checker >/dev/null
-    then
-        echo "($checker is not available, check skipped.)"
-        return 0
-    fi
-
-    if ! eval "$checker $checker_opts \"$changed_file\""
-    then
-        error "$filename doesn't pass $checker syntax check."
-    fi
-}
+#function validate_script()
+#{
+#    local checker=
+#    local checker_opts=
+#    local changed_file=$( create_changed_file "$2" )
+#    if [ "$1" = "pl" ]
+#    then
+#        checker=perl
+#        checker_opts="-c"
+#    elif [ "$1" = "py" ]
+#    then
+#        checker=python3
+#        checker_opts="-m py_compile"
+#    fi
+#
+#    if ! which $checker >/dev/null
+#    then
+#        echo "($checker is not available, check skipped.)"
+#        return 0
+#    fi
+#
+#    if ! eval "$checker $checker_opts \"$changed_file\""
+#    then
+#        error "$filename doesn't pass $checker syntax check."
+#    fi
+#}
 
 
 function get_extension()
@@ -288,14 +297,10 @@ function writefile() {
             echo "does not exist so created $currentfile"
         fi
         git show $newrev:$filename > "$currentfile"
-#        rm -f $currentfile
-#        mv "$currentfile.txt" "$currentfile"
         echo "current file is $currentfile"
-#        cat $currentfile;
 }
 
 function fileAnalysis() {
-  checkError
   local filename="$1"
   local currentDir="$2"
   local TMP_DIR="$3"
@@ -316,23 +321,18 @@ function fileAnalysis() {
 #		           echo "vd current file is $currentfile"
 		           echo "ready to validate php"
                 validate_php "$currentfile" "$currentDir" "$TMP_DIR" "$destination_user" "$destination_host"
-            elif [ "$extension" = "pl" ] || [ "$extension" = "py" ]
-            then
-                validate_script $extension $filename
+#            elif [ "$extension" = "pl" ] || [ "$extension" = "py" ]
+#            then
+#                validate_script $extension $filename
 			      fi
 }
 
-
-trap "cleanup" INT QUIT TERM TSTP EXIT
+#trap "cleanup" INT QUIT TERM TSTP EXIT
 
 # Run loop as soon as possible, to ensure this is this loop that will handle stdin
 while read oldrev newrev ref
 do
   ####################[Checkout current Branch]########################################
-  errorStatus=0
-  destination_user="root"
-  destination_host="172.19.0.1"
-  projDir='jianghu_entertain'
   TMP_DIR=$( mktemp -d /var/www/tmp/pre-receive-hook-XXXXX )
   currentDir=$TMP_DIR/$projDir
   echo commit is $commit;
@@ -380,14 +380,91 @@ do
 	#############################################
 	for commit in $( git rev-list ${oldrev}..${newrev} )
 	do
+      # 'set -e' tells the shell to exit if any of the foreground command fails,
+    # i.e. exits with a non-zero status.
+#    set -eu
+    # Initialize array of PIDs for the background jobs that we're about to launch.
+    pids=()
 		for filename in $( git diff --name-only $commit^..$commit )
 		do
 		 ################################[parallel analyzing files ]###################################
-		 fileAnalysis "$filename" "$currentDir" "$TMP_DIR" "$destination_user" "$destination_host"
+		 fileAnalysis "$filename" "$currentDir" "$TMP_DIR" "$destination_user" "$destination_host" &
+		 # Add the PID of this background job to the array.
+     pids+=($!)
 		 #############################################################################################
 		done
+		####################################################
+#		wait_and_get_exit_codes "${pids[@]}"
+#		# it seems it does not work well if using echo for function return value, and calling inside $() (is a subprocess spawned?)
+#    function wait_and_get_exit_codes() {
+#        children=("$@")
+#        EXIT_CODE=0
+#        for job in "${children[@]}"; do
+#           echo "PID => ${job}"
+#           CODE=0;
+#           wait ${job} || CODE=$?
+#           if [[ "${CODE}" != "0" ]]; then
+#               echo "At least one test failed with exit code => ${CODE}" ;
+#               EXIT_CODE=1;
+#           fi
+#       done
+##       cleanup $TMP_DIR
+#    }
+#    echo "EXIT_CODE => $EXIT_CODE"
+#    exit "$EXIT_CODE"
+		####################################################
+		# Wait for each specific process to terminate.
+    # Instead of this loop, a single call to 'wait' would wait for all the jobs
+    # to terminate, but it would not give us their exit status.
+    #
+#    pcounter=0
+#    errorFinalStatus=0
+    for pid in "${pids[@]}"; do
+      echo "pid is $pid before wait"
+      echo "pids is $pids before wait"
+      echo "last is $lastpid before wait"
+      #
+      # Waiting on a specific PID makes the wait command return with the exit
+      # status of that process. Because of the 'set -e' setting, any exit status
+      # other than zero causes the current shell to terminate with that exit
+      # status as well.
+      #
+#      ((pcounter++))
+      wait "$pid"
+      exit_status=$?
+      lastpid=$!
+      min=0
+      max=$(( ${#pids[@]} -1 ))
+      x="${pids[$min]}"
+      y="${pids[$max]}"
+      echo "min is $x"
+      echo "max is $y"
+#      echo "pid is $pid after wait"
+      echo "pids is $pids after wait"
+      echo "last is $lastpid after wait"
+      echo "exit status: $exit_status"
+      if [ "$exit_status" -gt 0 ]; then
+#        errorFinalStatus=$((errorFinalStatus+$exit_status))
+        echo "current exist status is $exit_status at gt 0"
+        cleanup $TMP_DIR
+        exit 1
+#      elif [ "$exit_status" -eq "0" ]; then
+#        if [ ! -z "$lastpid" ] && [ "$y" -eq $((lastpid-1)) ]; then
+#          echo "pids is $pids";
+#          echo "last is $lastpid"
+#          echo "current exist status is $exit_status at elif"
+#          cleanup $TMP_DIR
+##          exit $exit_status
+##        else
+##          continue
+#        fi
+      fi
+#      echo "final exit status: $errorFinalStatus"
+#      exit $errorFinalStatus
+    done
 	done
 	############################################
 done
 cleanup $TMP_DIR
+#exit 1
 exit 0
