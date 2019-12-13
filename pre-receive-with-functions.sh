@@ -78,6 +78,7 @@ function error()
 #  echo "after errorStatus is $errorStatus"
 #    (($errorStatus++))
 #    echo "error status is $errorStatus"
+
     echo -e "\033[31m ================================================================ \033[0m"
     echo -e "\033[31m =                         错误  !!!                           = \033[0m"
     echo -e "\033[31m ================================================================ \033[0m"
@@ -170,18 +171,18 @@ function validate_php()
   local destination_user="$4"
   local destination_host="$5"
   echo "currentfile is $currentfile and currentDir is $currentDir and tmpdir is $TMP_DIR"
-  php=$(ssh -l $destination_user $destination_host \
-        -o PasswordAuthentication=no    \
-        -o StrictHostKeyChecking=no     \
-        -o UserKnownHostsFile=/dev/null \
-        -p 2225                         \
-        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-       "/usr/bin/php");
-    if [ -x $php ]
-    then
+#  php=$(ssh -l $destination_user $destination_host \
+#        -o PasswordAuthentication=no    \
+#        -o StrictHostKeyChecking=no     \
+#        -o UserKnownHostsFile=/dev/null \
+#        -p 2225                         \
+#        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+#       "/usr/bin/php");
+#    if [ -x $php ]
+#    then
         local changed_file="$1"
         echo $changed_file;
-        cat $changed_file;
+#        cat $changed_file;
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
         local projDir=$currentDir
         ################# [ phpcs checking ]######################
@@ -193,17 +194,23 @@ function validate_php()
         -o UserKnownHostsFile=/dev/null \
         -p 2225                         \
         -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-       "cd $projDir/vendor/bin;\
-./phpcs --standard=$RULESET $changed_file"
+       "if [ -d "$projDir/vendor/bin" ]; then
+        cd $projDir/vendor/bin;
+       ./phpcs --standard=$RULESET $changed_file;
+       fi"
         EXIT_STATUS=$?
         echo "exist status is $EXIT_STATUS"
-        if [ "$EXIT_STATUS" -eq "0" ]; then
-          echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
+          if [ "$EXIT_STATUS" -eq "0" ]; then
+            echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
+          else
+  #          cleanup $TMP_DIR
+            error " \t\033[41mPHPCS Failed: $filename\033[0m"
+          fi
         else
-#          cleanup $TMP_DIR
-          error " \t\033[41mPHPCS Failed: $filename\033[0m"
+          echo "now at phpcs folder already remove due to error"
         fi
         ######################[larastan checking ]##################################
+        if [ -d "$projDir" ]; then
         autoloadPath="$projDir/vendor/autoload.php"
         neonfile="$projDir/phpstan.neon"
         ssh -l $destination_user $destination_host \
@@ -212,8 +219,10 @@ function validate_php()
         -o UserKnownHostsFile=/dev/null \
         -p 2225                         \
         -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-       "cd $projDir;\
-       php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;"
+        "if [ -d "$projDir" ]; then
+         cd $projDir;
+         php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;
+       fi"
        STAN_STATUS=$?
         echo "STAN status is $STAN_STATUS"
           if [ "$STAN_STATUS" -eq "0" ]; then
@@ -224,12 +233,12 @@ function validate_php()
             error "Code Quality Test Failed"
           fi
         else
-          error "folder already remove due to error"
+          echo "now at stand folder already remove due to error"
         fi
         ########################################################
-    else
-        error "(php is not available, check skipped.)"
-    fi
+#    else
+#        error "(php is not available, check skipped.)"
+#    fi
 
     #PHPCS=$TMPTOOLS/phpcs.phar
     #if [ ! -e $PHPCS ]
@@ -465,6 +474,7 @@ do
 	done
 	############################################
 done
+sleep 5
 cleanup $TMP_DIR
 #exit 1
 exit 0
