@@ -101,6 +101,7 @@ EOL
         fi;
         git submodule init;
         git submodule sync;
+        chmod 777 ${destination_dir}/phpcs-rule;
         cd ${destination_dir}/phpcs-rule;
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;
