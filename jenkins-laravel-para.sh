@@ -84,7 +84,7 @@ case $Status  in
                 echo \"REMOTE is \$REMOTE\";\
               if [ \$LOCAL != \$REMOTE ] || [ -z \$REMOTE ]
 then
-              git reset --hard;
+              git reset --hard origin/$destination_branch;
               git fetch --all;
               git checkout -f $destination_branch;
               git reset --hard;
