@@ -178,7 +178,7 @@ function validate_php()
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
         local projDir=$currentDir
         ################# [ phpcs checking ]######################
-        RULESET="$projDir/phpcs.xml"
+        RULESET="$projDir/phpcs-rule/phpcs.xml"
         ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
@@ -197,7 +197,7 @@ function validate_php()
         fi
         ######################[larastan checking ]##################################
         autoloadPath="$projDir/vendor/autoload.php"
-        neonfile="$projDir/phpstan.neon"
+        neonfile="$projDir/phpcs-rule/phpstan.neon"
         ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
@@ -352,9 +352,24 @@ do
      git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout -b $current_branch origin/$current_branch --;\
      git reset --hard;\
      git fetch --all;\
-     git pull origin $current_branch;
+     git pull origin $current_branch;\
      git branch;\
      chmod -R 777 $currentDir;\
+     cat > ${currentDir}/.gitmodules <<EOL
+[submodule \"phpcs-rule\"]
+    path = phpcs-rule
+    url = ssh://git@${destination_host}:2289/php/phpcs-rule.git
+EOL
+        chmod 777 ${currentDir}/.gitmodules;\
+        if [[ ! -e ${currentDir}/phpcs-rule ]]; then \
+            git submodule add -f ssh://git@${destination_host}:2289/php/phpcs-rule.git phpcs-rule;\
+        fi;\
+        git submodule init;\
+        git submodule sync;\
+        cd ${currentDir}/phpcs-rule;\
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;\
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;\
+        git pull origin master;\
      "
   ###########################################################
 	# in a sub-shell ...
