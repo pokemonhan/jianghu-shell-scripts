@@ -22,7 +22,6 @@ NULL_SHA1="0000000000000000000000000000000000000000" # 40 0's
 UPTODATE_RUNNED=0
 DEBUG=0
 TMP_DIR=
-
 TMPTOOLS=/tmp/check_tools
 
 errorStatus=0
@@ -73,32 +72,29 @@ function cleanup()
 
 function error()
 {
-#  echo "before errorStatus is $errorStatus"
-#  errorStatus=$((errorStatus+1))
-#  echo "after errorStatus is $errorStatus"
 #    (($errorStatus++))
-#    echo "error status is $errorStatus"
-
+    echo "error status is $errorStatus"
     echo -e "\033[31m ================================================================ \033[0m"
     echo -e "\033[31m =                         错误  !!!                           = \033[0m"
     echo -e "\033[31m ================================================================ \033[0m"
     echo ""
     echo -e "\033[31m ERROR: $@ \033[0m"
     echo ""
+#    cleanup
     exit 3
 }
 
 
-#function warn()
-#{
-#    echo ""
-#    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
-#    echo -e "\033[1;31m\033[43m =                        WARNING !!!                           = \033[0m"
-#    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
-#    echo ""
-#    echo -e "\033[1;31m\033[43m >>> $@ \033[0m"
-#    echo ""
-#}
+function warn()
+{
+    echo ""
+    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
+    echo -e "\033[1;31m\033[43m =                        WARNING !!!                           = \033[0m"
+    echo -e "\033[1;31m\033[43m ================================================================ \033[0m"
+    echo ""
+    echo -e "\033[1;31m\033[43m >>> $@ \033[0m"
+    echo ""
+}
 
 
 function debug()
@@ -120,49 +116,6 @@ function checkError()
 }
 
 
-#function validate_crontab()
-#{
-#    local CHKCRONTAB=/usr/local/chkcrontab/chkcrontabb
-#    # check tool presence...
-#    if [ ! -x $CHKCRONTAB ]
-#    then
-#        if [ -x $TMPTOOLS/chkcrontab/chkcrontab ]
-#        then
-#            CHKCRONTAB=$TMPTOOLS/chkcrontab/chkcrontab
-#            # ensure up-to-date
-#            debug "ensure chkcrontab is up to date in $TMPTOOLS/chkcrontab"
-#            # in a sub-shell
-#            (
-#                cd $TMPTOOLS/chkcrontab
-#                unset GIT_DIR
-#                git pull -q origin
-#            )
-#        else
-#            echo "Install tool chkcrontab ..."
-#            if git clone -q $CHKCRONTAB_GIT $TMPTOOLS/chkcrontab
-#            then
-#                CHKCRONTAB=$TMPTOOLS/chkcrontab/chkcrontab
-#            fi
-#        fi
-#    fi
-#
-#    if [ ! -x $CHKCRONTAB ]
-#    then
-#        echo "(warning: crontab linter does not exists. Check skipped.)"
-#        return 0
-#    fi
-#
-#    local changed_file=$( create_changed_file "$1" )
-#    if ! $CHKCRONTAB $CHKCRONTAB_ARGS $changed_file
-#    then
-#        if ! $CHKCRONTAB $CHKCRONTAB_ARGS -u $changed_file
-#        then
-#            error "$filename doesn't pass crontab check."
-#        fi
-#    fi
-#}
-
-
 function validate_php()
 {
   local currentfile="$1"
@@ -171,74 +124,63 @@ function validate_php()
   local destination_user="$4"
   local destination_host="$5"
   echo "currentfile is $currentfile and currentDir is $currentDir and tmpdir is $TMP_DIR"
-#  php=$(ssh -l $destination_user $destination_host \
-#        -o PasswordAuthentication=no    \
-#        -o StrictHostKeyChecking=no     \
-#        -o UserKnownHostsFile=/dev/null \
-#        -p 2225                         \
-#        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-#       "/usr/bin/php");
-#    if [ -x $php ]
-#    then
-        local changed_file="$1"
-        echo $changed_file;
-#        cat $changed_file;
-#        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
-        local projDir=$currentDir
-        ################# [ phpcs checking ]######################
-        RULESET="$projDir/phpcs.xml"
-        if [ -d "$projDir" ]; then
-             ssh -l $destination_user $destination_host \
+  php=$(ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
         -o UserKnownHostsFile=/dev/null \
         -p 2225                         \
         -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-       "if [ -d "$projDir/vendor/bin" ]; then
-        cd $projDir/vendor/bin;
-       ./phpcs --standard=$RULESET $changed_file;
-       fi"
-        EXIT_STATUS=$?
-        echo "exist status is $EXIT_STATUS"
-          if [ "$EXIT_STATUS" -eq "0" ]; then
-            echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
-          else
-  #          cleanup $TMP_DIR
-            error " \t\033[41mPHPCS Failed: $filename\033[0m"
-          fi
-        else
-          echo "now at phpcs folder already remove due to error"
-        fi
-        ######################[larastan checking ]##################################
-        if [ -d "$projDir" ]; then
-        autoloadPath="$projDir/vendor/autoload.php"
-        neonfile="$projDir/phpstan.neon"
+       "/usr/bin/php");
+    if [ -x $php ]
+    then
+        local changed_file="$1"
+        echo $changed_file;
+        cat $changed_file;
+#        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
+        local projDir=$currentDir
+        ################# [ phpcs checking ]######################
+        RULESET="$projDir/phpcs-rule/phpcs.xml"
         ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
         -o UserKnownHostsFile=/dev/null \
         -p 2225                         \
         -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-        "if [ -d "$projDir" ]; then
-         cd $projDir;
-         php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;
-       fi"
+       "cd $projDir/vendor/bin;\
+./phpcs --standard=$RULESET $changed_file"
+        EXIT_STATUS=$?
+        echo "exist status is $EXIT_STATUS"
+        if [ "$EXIT_STATUS" -eq "0" ]; then
+          echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
+        else
+          cleanup $TMP_DIR
+          error " \t\033[41mPHPCS Failed: $filename\033[0m"
+        fi
+        ######################[larastan checking ]##################################
+        autoloadPath="$projDir/vendor/autoload.php"
+        neonfile="$projDir/phpcs-rule/phpstan.neon"
+        ssh -l $destination_user $destination_host \
+        -o PasswordAuthentication=no    \
+        -o StrictHostKeyChecking=no     \
+        -o UserKnownHostsFile=/dev/null \
+        -p 2225                         \
+        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+       "cd $projDir;\
+       php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;"
        STAN_STATUS=$?
         echo "STAN status is $STAN_STATUS"
           if [ "$STAN_STATUS" -eq "0" ]; then
             echo 'passed'
           else
             echo "$STAN_STATUS"
-#            cleanup $TMP_DIR
+            cleanup $TMP_DIR
             error "Code Quality Test Failed"
           fi
-        else
-          echo "now at stand folder already remove due to error"
-        fi
         ########################################################
-#    else
-#        error "(php is not available, check skipped.)"
-#    fi
+    else
+        cleanup $TMP_DIR
+        error "(php is not available, check skipped.)"
+    fi
 
     #PHPCS=$TMPTOOLS/phpcs.phar
     #if [ ! -e $PHPCS ]
@@ -260,34 +202,6 @@ function validate_php()
 }
 
 
-#function validate_script()
-#{
-#    local checker=
-#    local checker_opts=
-#    local changed_file=$( create_changed_file "$2" )
-#    if [ "$1" = "pl" ]
-#    then
-#        checker=perl
-#        checker_opts="-c"
-#    elif [ "$1" = "py" ]
-#    then
-#        checker=python3
-#        checker_opts="-m py_compile"
-#    fi
-#
-#    if ! which $checker >/dev/null
-#    then
-#        echo "($checker is not available, check skipped.)"
-#        return 0
-#    fi
-#
-#    if ! eval "$checker $checker_opts \"$changed_file\""
-#    then
-#        error "$filename doesn't pass $checker syntax check."
-#    fi
-#}
-
-
 function get_extension()
 {
     file="$( basename $1 )"
@@ -306,7 +220,10 @@ function writefile() {
             echo "does not exist so created $currentfile"
         fi
         git show $newrev:$filename > "$currentfile"
+#        rm -f $currentfile
+#        mv "$currentfile.txt" "$currentfile"
         echo "current file is $currentfile"
+#        cat $currentfile;
 }
 
 function fileAnalysis() {
@@ -336,12 +253,17 @@ function fileAnalysis() {
 			      fi
 }
 
-#trap "cleanup" INT QUIT TERM TSTP EXIT
+
+trap "cleanup" INT QUIT TERM TSTP EXIT
 
 # Run loop as soon as possible, to ensure this is this loop that will handle stdin
 while read oldrev newrev ref
 do
   ####################[Checkout current Branch]########################################
+  errorStatus=0
+  destination_user="root"
+  destination_host="172.19.0.1"
+  projDir='jianghu_entertain'
   TMP_DIR=$( mktemp -d /var/www/tmp/pre-receive-hook-XXXXX )
   currentDir=$TMP_DIR/$projDir
   echo commit is $commit;
@@ -362,9 +284,27 @@ do
      git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout -b $current_branch origin/$current_branch --;\
      git reset --hard;\
      git fetch --all;\
-     git pull origin $current_branch;
+     git pull origin $current_branch;\
      git branch;\
      chmod -R 777 $currentDir;\
+     cat > ${currentDir}/.gitmodules <<EOL
+[submodule \"phpcs-rule\"]
+    path = phpcs-rule
+    url = ssh://git@${destination_host}:2289/php/phpcs-rule.git
+EOL
+        chmod 777 ${currentDir}/.gitmodules;\
+        if [[ ! -e ${currentDir}/phpcs-rule ]]; then \
+            git submodule add -f ssh://git@${destination_host}:2289/php/phpcs-rule.git phpcs-rule;\
+        fi;\
+        git submodule init;\
+        git submodule sync;\
+        cd ${currentDir}/phpcs-rule;\
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;\
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;\
+        git reset --hard;\
+        git fetch --all;\
+        git pull origin master;\
+        chmod -R 777 $currentDir;\
      "
   ###########################################################
 	# in a sub-shell ...
@@ -389,92 +329,14 @@ do
 	#############################################
 	for commit in $( git rev-list ${oldrev}..${newrev} )
 	do
-      # 'set -e' tells the shell to exit if any of the foreground command fails,
-    # i.e. exits with a non-zero status.
-#    set -eu
-    # Initialize array of PIDs for the background jobs that we're about to launch.
-    pids=()
 		for filename in $( git diff --name-only $commit^..$commit )
 		do
 		 ################################[parallel analyzing files ]###################################
-		 fileAnalysis "$filename" "$currentDir" "$TMP_DIR" "$destination_user" "$destination_host" &
-		 # Add the PID of this background job to the array.
-     pids+=($!)
+		 fileAnalysis "$filename" "$currentDir" "$TMP_DIR" "$destination_user" "$destination_host"
 		 #############################################################################################
 		done
-		####################################################
-#		wait_and_get_exit_codes "${pids[@]}"
-#		# it seems it does not work well if using echo for function return value, and calling inside $() (is a subprocess spawned?)
-#    function wait_and_get_exit_codes() {
-#        children=("$@")
-#        EXIT_CODE=0
-#        for job in "${children[@]}"; do
-#           echo "PID => ${job}"
-#           CODE=0;
-#           wait ${job} || CODE=$?
-#           if [[ "${CODE}" != "0" ]]; then
-#               echo "At least one test failed with exit code => ${CODE}" ;
-#               EXIT_CODE=1;
-#           fi
-#       done
-##       cleanup $TMP_DIR
-#    }
-#    echo "EXIT_CODE => $EXIT_CODE"
-#    exit "$EXIT_CODE"
-		####################################################
-		# Wait for each specific process to terminate.
-    # Instead of this loop, a single call to 'wait' would wait for all the jobs
-    # to terminate, but it would not give us their exit status.
-    #
-#    pcounter=0
-#    errorFinalStatus=0
-    for pid in "${pids[@]}"; do
-      echo "pid is $pid before wait"
-      echo "pids is $pids before wait"
-      echo "last is $lastpid before wait"
-      #
-      # Waiting on a specific PID makes the wait command return with the exit
-      # status of that process. Because of the 'set -e' setting, any exit status
-      # other than zero causes the current shell to terminate with that exit
-      # status as well.
-      #
-#      ((pcounter++))
-      wait "$pid"
-      exit_status=$?
-      lastpid=$!
-      min=0
-      max=$(( ${#pids[@]} -1 ))
-      x="${pids[$min]}"
-      y="${pids[$max]}"
-      echo "min is $x"
-      echo "max is $y"
-#      echo "pid is $pid after wait"
-      echo "pids is $pids after wait"
-      echo "last is $lastpid after wait"
-      echo "exit status: $exit_status"
-      if [ "$exit_status" -gt 0 ]; then
-#        errorFinalStatus=$((errorFinalStatus+$exit_status))
-        echo "current exist status is $exit_status at gt 0"
-        cleanup $TMP_DIR
-        exit 1
-#      elif [ "$exit_status" -eq "0" ]; then
-#        if [ ! -z "$lastpid" ] && [ "$y" -eq $((lastpid-1)) ]; then
-#          echo "pids is $pids";
-#          echo "last is $lastpid"
-#          echo "current exist status is $exit_status at elif"
-#          cleanup $TMP_DIR
-##          exit $exit_status
-##        else
-##          continue
-#        fi
-      fi
-#      echo "final exit status: $errorFinalStatus"
-#      exit $errorFinalStatus
-    done
 	done
 	############################################
 done
-sleep 5
 cleanup $TMP_DIR
-#exit 1
 exit 0
