@@ -260,10 +260,6 @@ trap "cleanup" INT QUIT TERM TSTP EXIT
 while read oldrev newrev ref
 do
   ####################[Checkout current Branch]########################################
-  errorStatus=0
-  destination_user="root"
-  destination_host="172.19.0.1"
-  projDir='jianghu_entertain'
   TMP_DIR=$( mktemp -d /var/www/tmp/pre-receive-hook-XXXXX )
   currentDir=$TMP_DIR/$projDir
   echo commit is $commit;
