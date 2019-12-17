@@ -82,40 +82,39 @@ case $Status  in
                 echo \"LOCAL is \$LOCAL\";\
               REMOTE=\$(git ls-remote \$(git rev-parse --abbrev-ref @{u} | \sed 's/\// /g') | cut -f1);\
                 echo \"REMOTE is \$REMOTE\";\
-              if [ \$LOCAL != \$REMOTE ] || [ -z \$REMOTE ]
-then
-              git reset --hard origin/$destination_branch;
-              git fetch --all;
-              git checkout -f $destination_branch;
-              git reset --hard;
-              git fetch --all;
-              git pull origin $destination_branch;
+              if [[ \$LOCAL != \$REMOTE ]] || [[ -z \$REMOTE ]] ; then \
+              git reset --hard origin/$destination_branch;\
+              git fetch --all;\
+              git checkout -f $destination_branch;\
+              git reset --hard;\
+              git fetch --all;\
+              git pull origin $destination_branch;\
               cat > ${destination_dir}/.gitmodules <<EOL
 [submodule \"phpcs-rule\"]
     path = phpcs-rule
     url = ssh://git@${destination_host}:2289/php/phpcs-rule.git
 EOL
-        chmod 777 ${destination_dir}/.gitmodules;
-        if [[ ! -e ${destination_dir}/phpcs-rule ]]; then
-            git submodule add -f ssh://git@${destination_host}:2289/php/phpcs-rule.git phpcs-rule;
-        fi;
-        git submodule init;
-        git submodule sync;
-        chmod 777 ${destination_dir}/phpcs-rule;
-        cd ${destination_dir}/phpcs-rule;
-        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;
-        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;
-        git pull origin master;
-        cd $destination_dir;
-              rm -rf composer.lock;
-              git tag -l | xargs git tag -d && git fetch -t;
-              /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;
-              php artisan clear-compiled;
-              php artisan cache:clear;
-              php artisan route:cache;
-              php artisan config:cache;
-              chmod -R 777 ${destination_dir}/storage;
-              counter=0
+        chmod 777 ${destination_dir}/.gitmodules;\
+        if [[ ! -e ${destination_dir}/phpcs-rule ]]; then \
+            git submodule add -f ssh://git@${destination_host}:2289/php/phpcs-rule.git phpcs-rule;\
+        fi;\
+        git submodule init;\
+        git submodule sync;\
+        chmod 777 ${destination_dir}/phpcs-rule;\
+        cd ${destination_dir}/phpcs-rule;\
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;\
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;\
+        git pull origin master;\
+        cd $destination_dir;\
+              rm -rf composer.lock;\
+              git tag -l | xargs git tag -d && git fetch -t;\
+              /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
+              php artisan clear-compiled;\
+              php artisan cache:clear;\
+              php artisan route:cache;\
+              php artisan config:cache;\
+              chmod -R 777 ${destination_dir}/storage;\
+              counter=0;\
                 while [ \$counter -lt 20 ]
                 do
                   message=\"\$(git log -1 --skip \$counter --pretty=%B)\"
@@ -128,10 +127,10 @@ EOL
                    fi
                   echo count is \$counter and message is \$message
                 done
-              git tag -l $version_prefix-$BUILD_NUMBER
-              git tag -a -f -m '\$message' $version_prefix-$BUILD_NUMBER
-              git push --follow-tags;
-else
+              git tag -l $version_prefix-$BUILD_NUMBER;\
+              git tag -a -f -m \$message $version_prefix-$BUILD_NUMBER;\
+              git push --follow-tags;\
+else\
     echo \"Nothing to do\";
 fi;\
               "
