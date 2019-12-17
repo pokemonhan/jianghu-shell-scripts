@@ -138,6 +138,7 @@ function validate_php()
         cat $changed_file;
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
         local projDir=$currentDir
+        if [ -f "$currentfile" ]; then
         ################# [ phpcs checking ]######################
         RULESET="$projDir/phpcs-rule/phpcs.xml"
         ssh -l $destination_user $destination_host \
@@ -157,7 +158,7 @@ function validate_php()
           error " \t\033[41mPHPCS Failed: $filename\033[0m"
         fi
         ######################[larastan checking ]##################################
-        autoloadPath="$projDir/vendor/autoload.php"
+             autoloadPath="$projDir/vendor/autoload.php"
         neonfile="$projDir/phpcs-rule/phpstan.neon"
         ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
@@ -177,6 +178,7 @@ function validate_php()
             error "Code Quality Test Failed"
           fi
         ########################################################
+        fi
     else
         cleanup $TMP_DIR
         error "(php is not available, check skipped.)"
@@ -215,14 +217,23 @@ function writefile() {
   local currentfile="$currentDir/$filename"
     #		    echo file name is $filename;
 		    mkdir -m 777 -p $(dirname "$currentfile")
-        if [ ! -f "$currentfile" ]; then
+		    newFile=$(git show $newrev:$filename)
+		    if [ -z "$newFile" ]; then
+		        echo "$currentfile empty"
+		      if [ -f "$currentfile" ]; then
+             rm -f "$currentfile"
+          fi
+		    else
+		      if [ ! -f "$currentfile" ]; then
              touch "$currentfile";
             echo "does not exist so created $currentfile"
-        fi
-        git show $newrev:$filename > "$currentfile"
-#        rm -f $currentfile
-#        mv "$currentfile.txt" "$currentfile"
-        echo "current file is $currentfile"
+          fi
+          git show $newrev:$filename > "$currentfile"
+  #        rm -f $currentfile
+  #        mv "$currentfile.txt" "$currentfile"
+          echo "current file is $currentfile"
+		    fi
+
 #        cat $currentfile;
 }
 
