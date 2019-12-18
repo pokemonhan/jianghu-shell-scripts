@@ -137,9 +137,8 @@ function validate_php()
         cat $changed_file;
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
         if [ -d "$projDir" ]; then
-        ################# [ phpcs checking ]######################
-        validatePhpcs "$destination_user" "$destination_host" "$projDir" "$changed_file" "$filename" "$TMP_DIR"
-        ######################[larastan checking ]##################################
+        ################# [ phpcs checking & larastan checking]######################
+        validatePhpcs "$destination_user" "$destination_host" "$projDir" "$changed_file" "$filename" "$TMP_DIR" &
         validatePHPStan "$destination_user" "$destination_host" "$projDir" "$changed_file" "$TMP_DIR"
         ########################################################
         else
