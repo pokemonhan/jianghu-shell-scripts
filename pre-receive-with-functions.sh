@@ -118,12 +118,12 @@ function checkError()
 
 function validate_php()
 {
-  local currentfile="$1"
-  local currentDir="$2"
+  local changed_file="$1"
+  local projDir="$2"
   local TMP_DIR="$3"
   local destination_user="$4"
   local destination_host="$5"
-  echo "currentfile is $currentfile and currentDir is $currentDir and tmpdir is $TMP_DIR"
+  echo "currentfile is $changed_file and currentDir is $projDir and tmpdir is $TMP_DIR"
   php=$(ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
@@ -133,51 +133,18 @@ function validate_php()
        "/usr/bin/php");
     if [ -x $php ]
     then
-        local changed_file="$1"
         echo $changed_file;
         cat $changed_file;
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
-        local projDir=$currentDir
-        if [ -f "$currentfile" ]; then
+        if [ -d "$projDir" ]; then
         ################# [ phpcs checking ]######################
-        RULESET="$projDir/phpcs-rule/phpcs.xml"
-        ssh -l $destination_user $destination_host \
-        -o PasswordAuthentication=no    \
-        -o StrictHostKeyChecking=no     \
-        -o UserKnownHostsFile=/dev/null \
-        -p 2225                         \
-        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-       "cd $projDir/vendor/bin;\
-./phpcs --standard=$RULESET $changed_file"
-        EXIT_STATUS=$?
-        echo "exist status is $EXIT_STATUS"
-        if [ "$EXIT_STATUS" -eq "0" ]; then
-          echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
-        else
-          cleanup $TMP_DIR
-          error " \t\033[41mPHPCS Failed: $filename\033[0m"
-        fi
+        validatePhpcs "$destination_user" "$destination_host" "$projDir" "$changed_file" "$filename" "$TMP_DIR"
         ######################[larastan checking ]##################################
-             autoloadPath="$projDir/vendor/autoload.php"
-        neonfile="$projDir/phpcs-rule/phpstan.neon"
-        ssh -l $destination_user $destination_host \
-        -o PasswordAuthentication=no    \
-        -o StrictHostKeyChecking=no     \
-        -o UserKnownHostsFile=/dev/null \
-        -p 2225                         \
-        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
-       "cd $projDir;\
-       php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;"
-       STAN_STATUS=$?
-        echo "STAN status is $STAN_STATUS"
-          if [ "$STAN_STATUS" -eq "0" ]; then
-            echo 'passed'
-          else
-            echo "$STAN_STATUS"
-            cleanup $TMP_DIR
-            error "Code Quality Test Failed"
-          fi
+        validatePHPStan "$destination_user" "$destination_host" "$projDir" "$changed_file" "$TMP_DIR"
         ########################################################
+        else
+          echo "dir was clear due to error"
+          exit 1;
         fi
     else
         cleanup $TMP_DIR
@@ -201,6 +168,65 @@ function validate_php()
     #else
     #    echo "(phpCS is not available, check skipped.)"
     #fi
+}
+
+function validatePhpcs() {
+  local destination_user="$1"
+  local destination_host="$2"
+  local projDir="$3"
+  local changed_file="$4"
+  local filename="$5"
+  local TMP_DIR="$6"
+  if [ -f "$changed_file" ]; then
+    ################# [ phpcs checking ]######################
+        RULESET="$projDir/phpcs-rule/phpcs.xml"
+        ssh -l "$destination_user" "$destination_host" \
+        -o PasswordAuthentication=no    \
+        -o StrictHostKeyChecking=no     \
+        -o UserKnownHostsFile=/dev/null \
+        -p 2225                         \
+        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+       "cd $projDir/vendor/bin;\
+./phpcs --standard=$RULESET $changed_file"
+        EXIT_STATUS=$?
+        echo "exist status is $EXIT_STATUS"
+        if [ "$EXIT_STATUS" -eq "0" ]; then
+          echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
+        else
+          cleanup $TMP_DIR
+          error " \t\033[41mPHPCS Failed: $filename\033[0m"
+        fi
+  fi
+}
+
+function validatePHPStan() {
+  local destination_user="$1"
+  local destination_host="$2"
+  local projDir="$3"
+  local changed_file="$4"
+  local TMP_DIR="$5"
+  if [ -f "$changed_file" ]; then
+    ################# [ php-stan checking ]######################
+    autoloadPath="$projDir/vendor/autoload.php"
+    neonfile="$projDir/phpcs-rule/phpstan.neon"
+    ssh -l "$destination_user" "$destination_host" \
+    -o PasswordAuthentication=no    \
+    -o StrictHostKeyChecking=no     \
+    -o UserKnownHostsFile=/dev/null \
+    -p 2225                         \
+    -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+   "cd $projDir;\
+   php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;"
+   STAN_STATUS=$?
+    echo "STAN status is $STAN_STATUS"
+      if [ "$STAN_STATUS" -eq "0" ]; then
+        echo 'passed'
+      else
+        echo "$STAN_STATUS"
+        cleanup $TMP_DIR
+        error "Code Quality Test Failed"
+      fi
+    fi
 }
 
 
