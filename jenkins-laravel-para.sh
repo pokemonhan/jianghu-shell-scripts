@@ -132,7 +132,7 @@ EOL
               git tag -l $version_prefix-$BUILD_NUMBER;\
               git tag -a $version_prefix-$BUILD_NUMBER -f -m \"\${message}\";\
               git push --follow-tags;\
-              telegrammsg=\"已发布版本:$version_prefix-$BUILD_NUMBER \n发布摘要:\${message} \";\
+              telegrammsg=\"🤩🤩🤩🤩🤩🤩【 已发布版本：$version_prefix-$BUILD_NUMBER 】 🤩🤩🤩🤩🤩🤩 \n\n发布摘要: \${message} \";\
               send_message $tg_chat_group_id \${telegrammsg};\
 else\
     echo \"Nothing to do\";
