@@ -132,6 +132,9 @@ EOL
               git tag -l $version_prefix-$BUILD_NUMBER;\
               git tag -a $version_prefix-$BUILD_NUMBER -f -m \"\${message}\";\
               git push --follow-tags;\
+              cd /var/www/telegram-bot-bash;\
+              export BASHBOT_HOME=\"\$(pwd)\";\
+              source ./bashbot.sh source;\
               telegrammsg=\"🤩🤩🤩🤩🤩🤩【 已发布版本：$version_prefix-$BUILD_NUMBER 】 🤩🤩🤩🤩🤩🤩 \n\n发布摘要: \${message} \";\
               send_message $tg_chat_group_id \${telegrammsg};\
 else\
