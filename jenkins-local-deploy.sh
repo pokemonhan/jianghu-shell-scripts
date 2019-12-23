@@ -60,7 +60,7 @@ case $Type  in
                   -o StrictHostKeyChecking=no     \
                   -o UserKnownHostsFile=/dev/null \
                   -p 2225                         \
-                  -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+                  -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                  "cd $destination_dir;\
                  /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
                   php artisan clear-compiled;\
@@ -89,7 +89,7 @@ case $Type  in
                   -o StrictHostKeyChecking=no     \
                   -o UserKnownHostsFile=/dev/null \
                   -p 2225                         \
-                  -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+                  -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                  "cd $destination_dir;\
                  /usr/local/bin/composer update --no-interaction --no-progress --no-ansi;\
                   php artisan clear-compiled;\
@@ -115,7 +115,7 @@ case $Type  in
                         -o StrictHostKeyChecking=no     \
                         -o UserKnownHostsFile=/dev/null \
                         -p 2225                         \
-                        -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+                        -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                        "cd $destination_dir;\
                         php artisan clear-compiled;\
                         php artisan cache:clear;\
@@ -138,7 +138,7 @@ case $Type  in
 #                   -o StrictHostKeyChecking=no     \
 #                   -o UserKnownHostsFile=/dev/null \
 #                   -p 2225                         \
-#                   -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+#                   -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
 #                  "cd /var/www/shareprj/ethan/site/jianghu_entertain;\
 #                   GET_COMMAND=\"ls -ld /var/www/shareprj/ethan/site/jianghu_entertain\";\
 #                   echo \$GET_COMMAND;\
@@ -160,7 +160,7 @@ case $Type  in
                       -o StrictHostKeyChecking=no     \
                       -o UserKnownHostsFile=/dev/null \
                       -p 2225                         \
-                      -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+                      -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                      "cd $destination_dir;\
                      /usr/local/bin/composer dump-autoload;\
                      chmod -R 777 ${destination_dir}/storage;\
@@ -192,7 +192,7 @@ fi
                           -o StrictHostKeyChecking=no     \
                           -o UserKnownHostsFile=/dev/null \
                           -p 2225                         \
-                          -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+                          -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
                          $ActionCommand;\
                          /usr/local/bin/composer dump-autoload;\
@@ -217,7 +217,7 @@ fi
                           -o StrictHostKeyChecking=no     \
                           -o UserKnownHostsFile=/dev/null \
                           -p 2225                         \
-                          -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+                          -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
                          $ArtisanCommand;\
                          chmod -R 777 ${destination_dir}/storage;\
@@ -241,7 +241,7 @@ fi
                           -o StrictHostKeyChecking=no     \
                           -o UserKnownHostsFile=/dev/null \
                           -p 2225                         \
-                          -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+                          -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
                           rm -rf $destination_dir/$FilePath;\
     "

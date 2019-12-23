@@ -74,7 +74,7 @@ case $Status  in
               -o StrictHostKeyChecking=no     \
               -o UserKnownHostsFile=/dev/null \
               -p 2225                         \
-              -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+              -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
              "cd $destination_dir;\
               echo \"\${1:-'@{u}'}\"\;
               UPSTREAM=\${1:-'@{u}'};\
@@ -156,7 +156,7 @@ fi;\
       #        -o StrictHostKeyChecking=no     \
       #        -o UserKnownHostsFile=/dev/null \
       #        -p 2225                         \
-      #        -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+      #        -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
       #        "cat ${destination_dir}/tests/results/${destination_project}_test1.xml" > ${item_rootdir}/tests/results/${destination_project}_test1.xml
 
       echo "Completing Build!"
@@ -265,7 +265,7 @@ fi;\
               -o StrictHostKeyChecking=no     \
               -o UserKnownHostsFile=/dev/null \
               -p 2225                         \
-              -i /var/jenkins_workspace/harrisdock/workspace7/insecure_id_rsa    \
+              -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
              "cd $destination_dir;\
               rm -rf composer.lock;\
               if git rev-parse ${Version} >/dev/null 2>&1
