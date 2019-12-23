@@ -135,8 +135,9 @@ EOL
               cd /var/www/telegram-bot-bash;\
               export BASHBOT_HOME=\"\$(pwd)\";\
               source ./bashbot.sh source;\
-              telegrammsg=\"🤩🤩🤩🤩🤩🤩 [ 已发布版本：$version_prefix-$BUILD_NUMBER ] 🤩🤩🤩🤩🤩🤩 \n\n发布摘要: \${message} \";\
-              send_message $tg_chat_group_id \${telegrammsg};\
+              startEmoji=\"🤩🤩🤩🤩🤩🤩\";\
+              telegrammsg=\$startEmoji\"[ 已发布版本:$version_prefix-$BUILD_NUMBER ]\$startEmoji\n\n[ 发布摘要:\$message ]\";\
+              send_message $tg_chat_group_id \"\$telegrammsg\";\
 else\
     echo \"Nothing to do\";
 fi;\
