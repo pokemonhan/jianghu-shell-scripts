@@ -129,7 +129,7 @@ function validate_php()
         -o StrictHostKeyChecking=no     \
         -o UserKnownHostsFile=/dev/null \
         -p 2225                         \
-        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+        -i /var/www/harrisdock/workspace/insecure_id_rsa    \
        "/usr/bin/php");
     if [ -x $php ]
     then
@@ -184,7 +184,7 @@ function validatePhpcs() {
         -o StrictHostKeyChecking=no     \
         -o UserKnownHostsFile=/dev/null \
         -p 2225                         \
-        -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+        -i /var/www/harrisdock/workspace/insecure_id_rsa    \
        "cd $projDir/vendor/bin;\
 ./phpcs --standard=$RULESET $changed_file"
         EXIT_STATUS=$?
@@ -213,7 +213,7 @@ function validatePHPStan() {
     -o StrictHostKeyChecking=no     \
     -o UserKnownHostsFile=/dev/null \
     -p 2225                         \
-    -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+    -i /var/www/harrisdock/workspace/insecure_id_rsa    \
    "cd $projDir;\
    php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;"
    STAN_STATUS=$?
@@ -310,7 +310,7 @@ do
       -o StrictHostKeyChecking=no     \
       -o UserKnownHostsFile=/dev/null \
       -p 2225                         \
-      -i /var/www/harrisdock/workspace7/insecure_id_rsa    \
+      -i /var/www/harrisdock/workspace/insecure_id_rsa    \
      "cd $currentDir;\
      git reset --hard;\
      git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout -b $current_branch origin/$current_branch --;\
