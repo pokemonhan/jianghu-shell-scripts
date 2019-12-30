@@ -49,10 +49,12 @@ if [ $(id -u) -eq 0 ]; then
       projectDir="jianghu_entertain"
       parentDir="$projectSourceDir/shareprj/$username/site/$projectDir"
       echo "parent Dir is $parentDir"
-      userDir="/home/$username/htdocs/$projectDir"
+      htdocDir="/home/$username/htdocs"
+      userDir="htdocDir/$projectDir"
       echo "user Dir is $userDir"
       mkdir -m 777 -p "$parentDir"
       mkdir -m 777 -p "$userDir"
+      chmod 775 "/home/$username"
       echo "start bind mounting"
 		  #bind mount dir
 		  mountString="$parentDir $userDir none defaults,bind 0 0"
@@ -61,7 +63,9 @@ if [ $(id -u) -eq 0 ]; then
 		  echo $mounting
       usermod -aG $USERGROUP $username
       usermod -d "/home/$username/" $username
-      chown "$username:$sftpOnlyMainUser" $userDir
+      #add htdoc folder to be able to retrieve
+      chown -R "$username:$sftpOnlyMainUser" "$htdocDir"
+#      chown "$username:$sftpOnlyMainUser" $userDir
       chown root:root "/home/$username"
       startssh=$(service ssh restart)
       echo $startssh
@@ -113,6 +117,7 @@ EOL
   echo "writing host file for $username"
   echo "domain for $username is $domain"
   echo "127.0.0.1  $domain" >> /etc/hosts
+  echo "docker dir is $dockerDir"
   cd "$dockerDir"
   docker-compose stop nginx
   docker-compose up -d nginx
