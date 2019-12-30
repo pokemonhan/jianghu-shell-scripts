@@ -5,6 +5,15 @@ sdomain='jianghu'
 projectSourceDir="/var/www"
 #projectSourceDir="$HOME/projects"
 dockerDir="$projectSourceDir/harrisdock"
+###################################CheckOS###############################################################
+OS=echo $(lsb_release -d | awk -F"\t" '{print $2}') | cut -d ' ' -f1
+echo "current os is $OS"
+if [ "$OS" = "CentOS" ]; then
+    osType=1;
+else
+  #temporary ubuntu
+    osType=0;
+fi
 ###################################Create user-sftp-only account start###################################
 if getent passwd $sftpOnlyMainUser > /dev/null 2>&1; then
     echo "$sftpOnlyMainUser exists"
@@ -14,7 +23,11 @@ else
 		useradd -s /bin/bash -m -p "$ftpPass" "$sftpOnlyMainUser"
 		if [ $? -eq 0 ]; then
 		    echo "$sftpOnlyMainUser has been added to system!"
-		    gpasswd -a "$sftpOnlyMainUser" sudo
+		    if [ $osType -eq 0 ]; then
+          gpasswd -a "$sftpOnlyMainUser" sudo
+        else
+          echo "$sftpOnlyMainUser should be add to root permission by yourself"
+        fi
 		else
 		  echo "Failed to add $sftpOnlyMainUser user !"
 		  exit 1
@@ -67,7 +80,12 @@ if [ $(id -u) -eq 0 ]; then
       chown -R "$username:$sftpOnlyMainUser" "$htdocDir"
 #      chown "$username:$sftpOnlyMainUser" $userDir
       chown root:root "/home/$username"
-      startssh=$(service ssh restart)
+      #1 means Centos
+      if [ $osType -eq 1 ]; then
+        startssh=$(systemctl restart sshd)
+      else
+        startssh=$(service ssh restart)
+      fi
       echo $startssh
       #to /home/harris
       nginxConfigFile="$dockerDir/nginx/sites/jianghuapi-$username.conf"
