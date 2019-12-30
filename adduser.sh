@@ -67,7 +67,7 @@ if [ $(id -u) -eq 0 ]; then
       echo "user Dir is $userDir"
       mkdir -m 777 -p "$parentDir"
       mkdir -m 777 -p "$userDir"
-      chmod 775 "/home/$username"
+      chmod 755 "/home/$username"
       echo "start bind mounting"
 		  #bind mount dir
 		  mountString="$parentDir $userDir none defaults,bind 0 0"
