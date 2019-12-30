@@ -6,7 +6,7 @@ projectSourceDir="/var/www"
 #projectSourceDir="$HOME/projects"
 dockerDir="$projectSourceDir/harrisdock"
 ###################################CheckOS###############################################################
-OS=echo $(lsb_release -d | awk -F"\t" '{print $2}') | cut -d ' ' -f1
+OS=echo "$(lsb_release -d | awk -F"\t" '{print $2}')" | cut -d ' ' -f1
 echo "current os is $OS"
 if [ "$OS" = "CentOS" ]; then
     osType=1;
