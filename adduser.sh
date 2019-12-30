@@ -1,4 +1,27 @@
 #!/bin/bash
+sftpOnlyMainUser='user-sftp-only'
+srecord='apionline'
+sdomain='jianghu'
+projectSourceDir="/var/www"
+#projectSourceDir="$HOME/projects"
+dockerDir="$projectSourceDir/harrisdock"
+###################################Create user-sftp-only account start###################################
+if getent passwd $sftpOnlyMainUser > /dev/null 2>&1; then
+    echo "$sftpOnlyMainUser exists"
+else
+    echo "$sftpOnlyMainUser does not exist"
+    ftpPass=$(perl -e 'print crypt($ARGV[0], "password")' 'sftppassword')
+		useradd -s /bin/bash -m -p "$ftpPass" "$sftpOnlyMainUser"
+		if [ $? -eq 0 ]; then
+		    echo "$sftpOnlyMainUser has been added to system!"
+		    gpasswd -a "$sftpOnlyMainUser" sudo
+		else
+		  echo "Failed to add $sftpOnlyMainUser user !"
+		  exit 1
+		fi
+fi
+################################Finished Create user-sftp-only account###################################
+#Create ftp user
 if [ $(id -u) -eq 0 ]; then
 	read -p "Enter username : " username
 	read -s -p "Enter password : " password
@@ -8,7 +31,7 @@ if [ $(id -u) -eq 0 ]; then
 		exit 1
 	else
 	  ######################################################
-	  USERGROUP='user-sftp-only'
+	  USERGROUP=$sftpOnlyMainUser
 	  grep $USERGROUP /etc/group 2>&1>/dev/null
   if [ $? != 0 ]
   then
@@ -22,9 +45,9 @@ if [ $(id -u) -eq 0 ]; then
 		  useradd -s /bin/bash -m -p $pass $username
 		  [ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
 
-      #create project directory for user
+      #create project directory for user inside do current project stored inside current user
       projectDir="jianghu_entertain"
-      parentDir="/home/harris/projects/shareprj/$username/site/$projectDir"
+      parentDir="$projectSourceDir/shareprj/$username/site/$projectDir"
       echo "parent Dir is $parentDir"
       userDir="/home/$username/htdocs/$projectDir"
       echo "user Dir is $userDir"
@@ -38,19 +61,21 @@ if [ $(id -u) -eq 0 ]; then
 		  echo $mounting
       usermod -aG $USERGROUP $username
       usermod -d "/home/$username/" $username
-      chown "$username:user-sftp-only" $userDir
+      chown "$username:$sftpOnlyMainUser" $userDir
       chown root:root "/home/$username"
       startssh=$(service ssh restart)
       echo $startssh
-      nginxConfigFile="/home/harris/projects/harrisdock/nginx/sites/jianghuapi-$username.conf"
+      #to /home/harris
+      nginxConfigFile="$dockerDir/nginx/sites/jianghuapi-$username.conf"
       echo "start configuration for nginx"
+      domain="$srecord.$sdomain.$username"
       cat > ${nginxConfigFile} <<EOL
 server {
 
     listen 80;
     listen [::]:80;
 
-    server_name api.jianghu.$username;
+    server_name $domain;
     root /var/www/shareprj/$username/site/$projectDir/public;
     index index.php index.html index.htm;
 
@@ -85,11 +110,10 @@ server {
 }
 EOL
   chmod 777 $nginxConfigFile
-  domain="api.jianghu.$username"
   echo "writing host file for $username"
   echo "domain for $username is $domain"
   echo "127.0.0.1  $domain" >> /etc/hosts
-  cd /home/harris/projects/harrisdock
+  cd "$dockerDir"
   docker-compose stop nginx
   docker-compose up -d nginx
   echo "done created user"
