@@ -50,7 +50,7 @@ if [ $(id -u) -eq 0 ]; then
       parentDir="$projectSourceDir/shareprj/$username/site/$projectDir"
       echo "parent Dir is $parentDir"
       htdocDir="/home/$username/htdocs"
-      userDir="htdocDir/$projectDir"
+      userDir="$htdocDir/$projectDir"
       echo "user Dir is $userDir"
       mkdir -m 777 -p "$parentDir"
       mkdir -m 777 -p "$userDir"
