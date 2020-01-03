@@ -1,4 +1,5 @@
 #!/bin/sh
+destination_dir="$1"
 
 function handleTagDate()
 {
@@ -22,7 +23,8 @@ function handleTagDate()
 	# echo "now is at $line" & echo "current tagName is $tagName and current date is $date"
 }
 
-cd /var/www/jianghu_entertain
+#/var/www/jianghu_entertain
+cd "$destination_dir"
 #Sync deleted Remote Tag to Local
 git tag -l | xargs git tag -d && git fetch -t;
 #Check which tag are older than specific days to remove
