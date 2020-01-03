@@ -12,8 +12,10 @@ function handleTagDate()
 	# echo "INFO: dtSec=$dtSec, taSec=$taSec" >&2
 	if [[ $dtSec -lt $taSec ]]; then
 		echo "$line alreay 2 days ago"
-		git tag -d "$tagName"
-		git push --delete origin "$tagName"
+		deleteTag=$(git tag -d "$tagName")
+		echo "$deleteTag"
+		pushStatus=$(git push --delete origin "$tagName")
+		echo "$pushStatus"
 	else
 		echo "$line can live more"
 	fi
@@ -23,12 +25,29 @@ function handleTagDate()
 cd /var/www/jianghu_entertain
 
 listsTag=$(git for-each-ref --sort=taggerdate --format '%(refname:short)|%(taggerdate:short)' refs/tags | egrep -v "(^\*|release*)")
+pids=()
 for line in $listsTag
 do
   ##############[ Date time clean Tag ]#############
   handleTagDate "$line" &
+  pids+=($!)
   ####################################################
 done
+for pid in "${pids[@]}"; do
+      #
+      # Waiting on a specific PID makes the wait command return with the exit
+      # status of that process. Because of the 'set -e' setting, any exit status
+      # other than zero causes the current shell to terminate with that exit
+      # status as well.
+      #
+      wait "$pid"
+      exit_status=$?
+      lastpid=$!
+      if [ "$exit_status" -gt 0 ]; then
+        echo "current exist status is $exit_status at gt 0"
+        exit 1
+      fi
+    done
 ###################################################
 #echo Press Enter...
 #read
