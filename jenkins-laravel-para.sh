@@ -109,6 +109,7 @@ EOL
         cd $destination_dir;\
               rm -rf composer.lock;\
               git tag -l | xargs git tag -d && git fetch -t;\
+              bash /var/www/jenkins-push-scripts/deletetag.sh \
               /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
               php artisan clear-compiled;\
               php artisan cache:clear;\
