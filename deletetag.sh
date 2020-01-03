@@ -1,4 +1,5 @@
 #!/bin/sh
+
 function handleTagDate()
 {
     local line="$1"
@@ -18,7 +19,9 @@ function handleTagDate()
 	fi
 	# echo "now is at $line" & echo "current tagName is $tagName and current date is $date"
 }
-cd /e/projects/jianghu_entertain
+
+cd /var/www/jianghu_entertain
+
 listsTag=$(git for-each-ref --sort=taggerdate --format '%(refname:short)|%(taggerdate:short)' refs/tags | egrep -v "(^\*|release*)")
 for line in $listsTag
 do
@@ -27,5 +30,5 @@ do
   ####################################################
 done
 ###################################################
-echo Press Enter...
-read
+#echo Press Enter...
+#read
