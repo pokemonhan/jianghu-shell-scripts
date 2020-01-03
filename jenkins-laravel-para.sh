@@ -107,16 +107,15 @@ EOL
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;\
         git pull origin master;\
         cd $destination_dir;\
-              rm -rf composer.lock;\
-              git tag -l | xargs git tag -d && git fetch -t;\
-              bash /var/www/jenkins-push-scripts/tag-handle/deletetag.sh \
-              /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
-              php artisan clear-compiled;\
-              php artisan cache:clear;\
-              php artisan route:cache;\
-              php artisan config:cache;\
-              chmod -R 777 ${destination_dir}/storage;\
-              bash /var/www/jenkins-push-scripts/tag-handle/createTag.sh $destination_dir $version_prefix $BUILD_NUMBER $tg_chat_group_id \
+        bash /var/www/jenkins-push-scripts/tag-handle/deletetag.sh \
+        rm -rf composer.lock;\
+        /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
+        php artisan clear-compiled;\
+        php artisan cache:clear;\
+        php artisan route:cache;\
+        php artisan config:cache;\
+        chmod -R 777 ${destination_dir}/storage;\
+        bash /var/www/jenkins-push-scripts/tag-handle/createTag.sh $destination_dir $version_prefix $BUILD_NUMBER $tg_chat_group_id \
 else\
     echo \"Nothing to do\";
 fi;\

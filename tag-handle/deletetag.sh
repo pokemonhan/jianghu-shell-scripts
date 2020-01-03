@@ -23,7 +23,9 @@ function handleTagDate()
 }
 
 cd /var/www/jianghu_entertain
-
+#Sync deleted Remote Tag to Local
+git tag -l | xargs git tag -d && git fetch -t;
+#Check which tag are older than specific days to remove
 listsTag=$(git for-each-ref --sort=taggerdate --format '%(refname:short)|%(taggerdate:short)' refs/tags | egrep -v "(^\*|release*)")
 pids=()
 for line in $listsTag

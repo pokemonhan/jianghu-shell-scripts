@@ -21,6 +21,7 @@ echo tag message now is ${message};
 git tag -l "$version_prefix-$BUILD_NUMBER";
 git tag -a "$version_prefix-$BUILD_NUMBER" -f -m "${message}";
 git push --follow-tags;
+#Send Telegram Message to Specific Group
 cd /var/www/telegram-bot-bash;
 export BASHBOT_HOME="$(pwd)";
 source ./bashbot.sh source;
