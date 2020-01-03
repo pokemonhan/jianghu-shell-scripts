@@ -106,9 +106,9 @@ EOL
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;\
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;\
         git pull origin master;\
-        bash /var/www/jenkins-push-scripts/tag-handle/deletetag.sh $destination_dir \
-        bash /var/www/jenkins-push-scripts/laravel-flow/artisan-command.sh $destination_dir \
-        bash /var/www/jenkins-push-scripts/tag-handle/createTag.sh $destination_dir $version_prefix $BUILD_NUMBER $tg_chat_group_id \
+        bash /var/www/jenkins-push-scripts/tag-handle/deletetag.sh $destination_dir; \
+        bash /var/www/jenkins-push-scripts/laravel-flow/artisan-command.sh $destination_dir; \
+        bash /var/www/jenkins-push-scripts/tag-handle/createTag.sh $destination_dir $version_prefix $BUILD_NUMBER $tg_chat_group_id; \
 else\
     echo \"Nothing to do\";
 fi;\
