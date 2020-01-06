@@ -231,7 +231,7 @@ fi;\
               -o UserKnownHostsFile=/dev/null \
               -p 2225                         \
               -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
-             "bash /var/www/$currentScriptDir/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id $version;"
+             "bash /var/www/$currentScriptDir/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id $Version;"
       else
           echo "Invalid branch provided : $destination_branch to Rollback"
           exit 1
