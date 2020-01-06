@@ -68,6 +68,6 @@ git push --follow-tags;
 cd /var/www/telegram-bot-bash;
 export BASHBOT_HOME="$(pwd)";
 source ./bashbot.sh source;
-startEmoji="🤩🤩🤩🤩🤩🤩";
+startEmoji="🤩";
 telegrammsg="$startEmoji [ 已发布版本:$vno ]$startEmoji\n\n[ 发布摘要:$message ]";
 send_message "$tg_chat_group_id" "$telegrammsg";
