@@ -126,7 +126,7 @@ EOL
               cd /var/www/telegram-bot-bash;\
               export BASHBOT_HOME=\"\$(pwd)\";\
               source ./bashbot.sh source;\
-              startEmoji=\"🤩🤩🤩🤩🤩🤩\";\
+              startEmoji=\"🤩\";\
               telegrammsg=\$startEmoji\"[ 测试服以同步发布]\$startEmoji\n\n[ 发布摘要:\$message ]\";\
               send_message $tg_chat_group_id \"\$telegrammsg\";\
 else\
