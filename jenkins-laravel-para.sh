@@ -17,7 +17,11 @@ destination_project="$1"
 destination_branch=`echo "$2" | awk -F "/" '{printf "%s", $2}'`
 version_prefix='jianghu';
 tg_chat_group_id='-356102284';
-
+#get current script directory dynamically
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo $dir;
+currentScriptDir="${dir##*/}";
+#currentScriptDir="${PWD##*/}";
 # Get configuration variables
 echo "Config files is ${scriptpath}/${destination_project}.conf"
 source ${scriptpath}/${destination_project}.conf
@@ -84,10 +88,10 @@ case $Status  in
               REMOTE=\$(git ls-remote \$(git rev-parse --abbrev-ref @{u} | \sed 's/\// /g') | cut -f1);\
                 echo \"REMOTE is \$REMOTE\";\
               if [[ \$LOCAL != \$REMOTE ]] || [[ -z \$REMOTE ]] ; then \
-        bash /var/www/jenkins-push-scripts/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
-        bash /var/www/jenkins-push-scripts/laravel-flow/artisan-command.sh $destination_dir; \
-        bash /var/www/jenkins-push-scripts/tag-handle/createTag.sh $destination_dir $version_prefix $BUILD_NUMBER $tg_chat_group_id; \
-        bash /var/www/jenkins-push-scripts/tag-handle/deletetag.sh $destination_dir; \
+        bash /var/www/$currentScriptDir/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
+        bash /var/www/$currentScriptDir/laravel-flow/artisan-command.sh $destination_dir; \
+        bash /var/www/$currentScriptDir/tag-handle/createTag.sh $destination_dir $version_prefix $BUILD_NUMBER $tg_chat_group_id; \
+        bash /var/www/$currentScriptDir/tag-handle/deletetag.sh $destination_dir; \
 else\
     echo \"Nothing to do\";
 fi;\
