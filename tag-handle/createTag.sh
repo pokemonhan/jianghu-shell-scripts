@@ -1,9 +1,7 @@
 #!/bin/sh
 counter=0;
 destination_dir="$1"
-version_prefix="$2"
-BUILD_NUMBER="$3"
-tg_chat_group_id="$4"
+tg_chat_group_id="$2"
 cd "$destination_dir"
 previousTag="$(git describe --abbrev=0)"
 #Increment Function to string with pre zero and integer

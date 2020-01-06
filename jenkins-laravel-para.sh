@@ -90,7 +90,7 @@ case $Status  in
               if [[ \$LOCAL != \$REMOTE ]] || [[ -z \$REMOTE ]] ; then \
         bash /var/www/$currentScriptDir/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
         bash /var/www/$currentScriptDir/laravel-flow/artisan-command.sh $destination_dir; \
-        bash /var/www/$currentScriptDir/tag-handle/createTag.sh $destination_dir $version_prefix $BUILD_NUMBER $tg_chat_group_id; \
+        bash /var/www/$currentScriptDir/tag-handle/createTag.sh $destination_dir $tg_chat_group_id; \
         bash /var/www/$currentScriptDir/tag-handle/deletetag.sh $destination_dir; \
 else\
     echo \"Nothing to do\";
@@ -201,53 +201,43 @@ fi;\
           echo "Invalid branch provided : $destination_branch"
           exit 1
       fi
-    ##################################################################
     ;;
-  Rollback)
+  ##################################################################
+  Rollback-Previous)
       echo "Status:$Status"
-      echo "Version:$Version to be starting to Rollback"
+      echo "Previous to be starting to Rollback"
       if [ "$destination_branch" == "master" ]
       then
-          # Push command over ssh
-          # git push -f
-          # git reset --hard "jianghu-5"
-          # grep 'at' <<< "HEAD is now at a3cc6ba hello1" | sed 's/^.*at //'
-          # git commit -m "版本回滚到 jianghu-5"
-          # git log -1 --pretty=%B #final first commit message
-          #########
           ssh -l $destination_user $destination_host \
               -o PasswordAuthentication=no    \
               -o StrictHostKeyChecking=no     \
               -o UserKnownHostsFile=/dev/null \
               -p 2225                         \
               -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
-             "cd $destination_dir;\
-              rm -rf composer.lock;\
-              if git rev-parse ${Version} >/dev/null 2>&1
-then
-      echo \"Found tag\"
-      reSetedFullMsg=\$(git reset --hard ${Version});
-      echo \"reSetedFullMsg is \$reSetedFullMsg\";
-      reSetedMsg=\$(grep 'at' <<< \$reSetedFullMsg | sed 's/^.*at //');
-      echo reSetedMsg is \$reSetedMsg;
-      git reset --soft HEAD@{1};
-      git commit -m \"版本回滚到 ${Version} \$reSetedMsg \";
-      git push origin master;
-      /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
-      php artisan clear-compiled;
-      php artisan cache:clear;
-      php artisan route:cache;
-      php artisan config:cache;
-      chmod -R 777 ${destination_dir}/storage;
-else
-    echo \"Tag not found\" !!!!!!!!!!!!!!!!!!!!!!
-fi;"
-    echo "Completing Rollback!"
+             "bash /var/www/$currentScriptDir/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id;"
       else
           echo "Invalid branch provided : $destination_branch to Rollback"
           exit 1
       fi
       ;;
+    Rollback)
+      echo "Status:$Status"
+      echo "Version:$Version to be starting to Rollback"
+      if [ "$destination_branch" == "master" ]
+      then
+          ssh -l $destination_user $destination_host \
+              -o PasswordAuthentication=no    \
+              -o StrictHostKeyChecking=no     \
+              -o UserKnownHostsFile=/dev/null \
+              -p 2225                         \
+              -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
+             "bash /var/www/$currentScriptDir/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id $version;"
+      else
+          echo "Invalid branch provided : $destination_branch to Rollback"
+          exit 1
+      fi
+      ;;
+  ##################################################################################
   *)
   exit
       ;;
