@@ -26,7 +26,10 @@ function createVersionNumber()
 	versionPrefix="V-JH-$(date +"%Y%m%d")"
 	set -f; IFS='-'
 	set -- $1
-	if [[ "$1" = "jianghu" ]]; then
+	if [[ -z $1 ]]; then
+	  versionNumber="$versionPrefix$(printf "%03d" 1)-$(printf "%03d" 1)"
+	  echo "$versionNumber"
+	elif [[ "$1" = "jianghu" ]]; then
 		versionPrefix="$versionPrefix$(printf "%03d" 1)"
 		pv=$2
 		((pv++))
@@ -36,8 +39,7 @@ function createVersionNumber()
 		dVno=$3
 		dayVno="${dVno:8:3}"
 		dayVno="$(incnumstr $dayVno 1)"
-		pv=$4
-		((pv++))
+		pv="$(incnumstr $4 1)"
 		versionNumber="$versionPrefix${dayVno}-$pv"
 		echo "$versionNumber"
 	fi
