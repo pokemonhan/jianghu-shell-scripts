@@ -35,8 +35,14 @@ function createVersionNumber()
 		echo "$versionNumber"
 	else
 		dVno=$3
-		dayVno="${dVno:8:3}"
-		dayVno="$(incnumstr $dayVno 1)"
+		prefiousPrefix="V-JH-${dVno:0:8}"
+		#同样一天的版本就累加不是同样就得从001开始
+		if [ "$prefiousPrefix" = "$versionPrefix" ]; then
+		    dayVno="${dVno:8:3}"
+        dayVno="$(incnumstr $dayVno 1)"
+    else
+        dayVno="$(printf "%03d" 1)"
+		fi
 		pv="$(incnumstr $4 1)"
 		versionNumber="$versionPrefix${dayVno}-$pv"
 		echo "$versionNumber"
@@ -44,18 +50,46 @@ function createVersionNumber()
 	set +f; unset IFS
 }
 
-while [[ ${counter} -lt 20 ]]
-do
-  message="$(git log -1 --skip $counter --pretty=%B)"
-  if [[ ${message} == *"Merge"* ]]; then
-   echo here is in merge "${message}";
-    ((counter++))
-   else
-   echo here is normal msg "${message}";
-      break
-   fi
-  echo count is "$counter" and message is "$message"
-done
+#echo Commit Message
+function echoCommitMessage()
+{
+    set -f; IFS=','
+    set -- $1
+    # b27da964db4b3e1534d35866f746055378aef2bd (master),Merge branch 'feature/taibo/h5-recharge-order-offline',Tue Jan 7 15:16:32 2020,Harris,<harrisdt15f@gmail.com>
+    # 01f6db6f894f18f89fc19b91747783ffd0bb6f8a (feature/taibo/h5-recharge-order-offline),:sparkles: write bb,Tue Jan 7 12:38:56 2020,Harris,<harrisdt15f@gmail.com>
+    # 356ab5f64176e7b9aa5cd99d0f7c148ca12a975f (feature/taibo/h5-recharge-order-offline~1),:sparkles: write aa,Tue Jan 7 12:38:39 2020,Harris,<harrisdt15f@gmail.com>
+    branchName=$(echo "$1"| cut -d ' ' -f2)
+    if [[ $2 == *"Merge"* ]]; then
+        echo here is in merge "$2";
+        return
+      fi
+    ((i++))
+    echo "$i:来自分支=》$branchName"
+    echo " 信息=》$2"
+    echo " 提交者=》$4,邮箱=》$5"
+    echo " 日期=》$3"
+    # echo "HashNo is $1,Message is $2,Date is $3,Author is $4,Mail is $5"
+    set +f; unset IFS
+    IFS=$'\n'       # make newlines the only separator
+    set -f
+}
+
+#create Commit Message
+function createCommitMessage()
+{
+    listsTag=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline --date=default-local --pretty='format:%H,%s,%ad,%an,<%ae>'| git name-rev --stdin)
+    IFS=$'\n'       # make newlines the only separator
+    set -f
+    i=0
+    for line in $listsTag
+    do
+      echoCommitMessage $line
+    done
+    set +f; unset IFS
+    # disable globbing
+}
+
+message="$(createCommitMessage)"
 echo tag message now is ${message};
 #################【 createing Verson Number 】########################
 #previousTag='V-JH-20200301001-253'
