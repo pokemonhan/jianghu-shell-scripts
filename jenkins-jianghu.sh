@@ -127,7 +127,7 @@ EOL
               export BASHBOT_HOME=\"\$(pwd)\";\
               source ./bashbot.sh source;\
               startEmoji=\"🤩\";\
-              telegrammsg=\$startEmoji\"[ 测试服以同步发布]\$startEmoji\n\n[ 发布摘要:\$message ]\";\
+              telegrammsg=\$startEmoji\"[ 测试服已同步发布]\$startEmoji\n\n[ 发布摘要:\$message ]\";\
               send_message $tg_chat_group_id \"\$telegrammsg\";\
 else\
     echo \"Nothing to do\";
