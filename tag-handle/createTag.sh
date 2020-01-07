@@ -1,5 +1,4 @@
 #!/bin/sh
-counter=0;
 destination_dir="$1"
 tg_chat_group_id="$2"
 cd "$destination_dir"
@@ -60,9 +59,9 @@ function echoCommitMessage()
     # 356ab5f64176e7b9aa5cd99d0f7c148ca12a975f (feature/taibo/h5-recharge-order-offline~1),:sparkles: write aa,Tue Jan 7 12:38:39 2020,Harris,<harrisdt15f@gmail.com>
     branchName=$(echo "$1"| cut -d ' ' -f2)
     if [[ $2 == *"Merge"* ]]; then
-        echo here is in merge "$2";
+#        echo here is in merge "$2";
         return
-      fi
+    fi
     ((i++))
     echo "$i:来自分支=》$branchName"
     echo " 信息=》$2"
