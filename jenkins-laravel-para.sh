@@ -12,7 +12,7 @@ then
 fi
 # Declare variables
 currentdate=`date "+%Y-%m-%d"`
-scriptpath="/var/jenkins_workspace/jianghu_php"
+scriptpath="/var/jenkins_workspace/$1"
 destination_project="$1"
 destination_branch=`echo "$2" | awk -F "/" '{printf "%s", $2}'`
 version_prefix='jianghu';

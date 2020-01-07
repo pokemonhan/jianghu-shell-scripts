@@ -3,10 +3,15 @@ destination_dir="$1"
 currentScriptDir="$2"
 tg_chat_group_id="$3"
 version="$4"
+echo "specific version is $version"
 #/var/www/jianghu_entertain
 cd "$destination_dir"
-if [[ -z $1 ]]; then
-  version="$(git describe --abbrev=0)"
+if [[ -z $version ]]; then
+    #current Latest Tag
+    #  version="$(git describe --abbrev=0)"
+    #Previous Tag before Latest Tag
+  version="$(git describe --abbrev=0 $(git describe --abbrev=0)^)"
+  echo "previous version is $version"
 fi
 if git rev-parse $version >/dev/null 2>&1
 then
