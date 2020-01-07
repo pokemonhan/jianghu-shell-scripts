@@ -82,6 +82,7 @@ function createCommitMessage()
     i=0
     for line in $listsTag
     do
+#      echo "current Line is $line"
       echoCommitMessage $line
     done
     set +f; unset IFS
