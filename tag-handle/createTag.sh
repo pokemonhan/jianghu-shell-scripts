@@ -52,33 +52,34 @@ function createVersionNumber()
 #echo Commit Message
 function echoCommitMessage()
 {
-    set -f; IFS=','
-    set -- $1
     # b27da964db4b3e1534d35866f746055378aef2bd (master),Merge branch 'feature/taibo/h5-recharge-order-offline',Tue Jan 7 15:16:32 2020,Harris,<harrisdt15f@gmail.com>
     # 01f6db6f894f18f89fc19b91747783ffd0bb6f8a (feature/taibo/h5-recharge-order-offline),:sparkles: write bb,Tue Jan 7 12:38:56 2020,Harris,<harrisdt15f@gmail.com>
     # 356ab5f64176e7b9aa5cd99d0f7c148ca12a975f (feature/taibo/h5-recharge-order-offline~1),:sparkles: write aa,Tue Jan 7 12:38:39 2020,Harris,<harrisdt15f@gmail.com>
+    set -f; IFS=','
+	set -- $1
     branchName=$(echo "$1"| cut -d ' ' -f2)
-    if [[ $2 == *"Merge"* ]]; then
+    if [[ $2 != *"Merge"* ]]; then
 #        echo here is in merge "$2";
-        return
+        ((i++))
+        echo "$i:来自分支=》$branchName"
+        echo " 信息=》$2"
+        echo " 提交者=》$4,邮箱=》$5"
+        echo " 日期=》$3"
+        # echo "HashNo is $1,Message is $2,Date is $3,Author is $4,Mail is $5"
     fi
-    ((i++))
-    echo "$i:来自分支=》$branchName"
-    echo " 信息=》$2"
-    echo " 提交者=》$4,邮箱=》$5"
-    echo " 日期=》$3"
-    # echo "HashNo is $1,Message is $2,Date is $3,Author is $4,Mail is $5"
     set +f; unset IFS
-    IFS=$'\n'       # make newlines the only separator
     set -f
+    IFS=$'\n'       # make newlines the only separator
 }
 
 #create Commit Message
 function createCommitMessage()
 {
-    listsTag=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline --date=default-local --pretty='format:%H,%s,%ad,%an,<%ae>'| git name-rev --stdin)
-    IFS=$'\n'       # make newlines the only separator
+    # make newlines the only separator
     set -f
+    IFS=$'\n'
+    listsTag=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline --date=default-local --pretty='format:%H,%s,%ad,%an,<%ae>'| git name-rev --stdin)
+#    echo "current Tag is $listsTag"
     i=0
     for line in $listsTag
     do
