@@ -12,12 +12,16 @@ then
 fi
 # Declare variables
 currentdate=`date "+%Y-%m-%d"`
-scriptpath="/var/jenkins_workspace/jianghu_php"
+scriptpath="/var/jenkins_workspace/$1"
 destination_project="$1"
 destination_branch=`echo "$2" | awk -F "/" '{printf "%s", $2}'`
 version_prefix='jianghu';
 tg_chat_group_id='-356102284';
-
+#get current script directory dynamically
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo $dir;
+currentScriptDir="${dir##*/}";
+#currentScriptDir="${PWD##*/}";
 # Get configuration variables
 echo "Config files is ${scriptpath}/${destination_project}.conf"
 source ${scriptpath}/${destination_project}.conf
@@ -42,6 +46,11 @@ destination_user="$dest_user_staging"
 destination_host="$dest_host_staging" #$dest_host_staging　
 destination_dir="$dest_dir_staging"
 gitlabip="172.19.0.1" # 172.22.0.1　9170ttt.com
+##################################################################################
+case $Status  in
+  Deploy)
+    echo "Status:$Status"
+    ##################################################################
 #     UPSTREAM=${1:-'@{u}'}
 #     LOCAL=$(git rev-parse @)
 #     REMOTE=$(git rev-parse "$UPSTREAM")
@@ -79,56 +88,10 @@ gitlabip="172.19.0.1" # 172.22.0.1　9170ttt.com
               REMOTE=\$(git ls-remote \$(git rev-parse --abbrev-ref @{u} | \sed 's/\// /g') | cut -f1);\
                 echo \"REMOTE is \$REMOTE\";\
               if [[ \$LOCAL != \$REMOTE ]] || [[ -z \$REMOTE ]] ; then \
-              git reset --hard origin/$destination_branch;\
-              git fetch --all;\
-              git checkout -f $destination_branch;\
-              git reset --hard;\
-              git fetch --all;\
-              git pull origin $destination_branch;\
-              cat > ${destination_dir}/.gitmodules <<EOL
-[submodule \"phpcs-rule\"]
-    path = phpcs-rule
-    url = ssh://git@${destination_host}:2289/php/phpcs-rule.git
-EOL
-        chmod 777 ${destination_dir}/.gitmodules;\
-        if [[ ! -e ${destination_dir}/phpcs-rule ]]; then \
-            git submodule add -f ssh://git@${destination_host}:2289/php/phpcs-rule.git phpcs-rule;\
-        fi;\
-        git submodule init;\
-        git submodule sync;\
-        chmod 777 ${destination_dir}/phpcs-rule;\
-        cd ${destination_dir}/phpcs-rule;\
-        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;\
-        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;\
-        git pull origin master;\
-        cd $destination_dir;\
-              rm -rf composer.lock;\
-              git tag -l | xargs git tag -d && git fetch -t;\
-              /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
-              php artisan clear-compiled;\
-              php artisan cache:clear;\
-              php artisan route:cache;\
-              php artisan config:cache;\
-              chmod -R 777 ${destination_dir}/storage;\
-              counter=0;\
-                while [ \$counter -lt 20 ]
-                do
-                  message=\"\$(git log -1 --skip \$counter --pretty=%B)\"
-                  if [[ \${message} == *\"Merge\"* ]]; then
-                   echo here is in merge \"\${message}\";
-                    ((counter++))
-                   else
-                   echo here is normal msg \"\${message}\";
-                      break
-                   fi
-                  echo count is \$counter and message is \$message
-                done
-              cd /var/www/telegram-bot-bash;\
-              export BASHBOT_HOME=\"\$(pwd)\";\
-              source ./bashbot.sh source;\
-              startEmoji=\"🤩\";\
-              telegrammsg=\$startEmoji\"[ 测试服已同步发布]\$startEmoji\n\n[ 发布摘要:\$message ]\";\
-              send_message $tg_chat_group_id \"\$telegrammsg\";\
+        bash /var/www/$currentScriptDir/stagingGitlabDeploy/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
+        bash /var/www/$currentScriptDir/stagingGitlabDeploy/laravel-flow/artisan-command.sh $destination_dir; \
+        bash /var/www/$currentScriptDir/stagingGitlabDeploy/tag-handle/createTag.sh $destination_dir $tg_chat_group_id; \
+        bash /var/www/$currentScriptDir/stagingGitlabDeploy/tag-handle/deletetag.sh $destination_dir; \
 else\
     echo \"Nothing to do\";
 fi;\
@@ -152,5 +115,131 @@ fi;\
       #        "cat ${destination_dir}/tests/results/${destination_project}_test1.xml" > ${item_rootdir}/tests/results/${destination_project}_test1.xml
 
       echo "Completing Build!"
- fi;
+      ###################
+      # PRODUCTION PUSH # production
+      ###################
+      elif [ "$destination_branch" == "production" ]
+      then
+          destination_user="$dest_user_prod"
+          destination_host="$dest_host_prod"
+          destination_dir="$dest_dir_prod"
+          pre_prod_dir="$pre_prod"
+          # Prep the api doc gen command for production only
+          if [ "$gen_docs_prod" == "TRUE" ]
+          then
+              gen_docs_cmd="php ${gen_docs_proddir}/vendor/bin/apigen generate --source=${destination_dir}/app --destination=${gen_docs_proddir}/public/api --template-theme=bootstrap --title=\"SFS Developer Docs\" -q --tree"
+          else
+              gen_docs_cmd="whoami"
+          fi
+
+          # Get current latest commit running on prod
+          ssh -l $destination_user $destination_host "cd $destination_dir;git fetch --all"
+          current_local_commit=`ssh -l $destination_user $destination_host "cd $destination_dir;git rev-parse --short HEAD"`
+          current_remote_commit=`ssh -l $destination_user $destination_host "cd $destination_dir;git rev-parse --short origin/${destination_branch} "`
+
+          # Make sure local and remote arent the same because then theres no reason to push
+          if [ "$current_local_commit" == "$current_remote_commit" ]
+          then
+              alert_msg="Remote HEAD : $current_remote_commit matches Local HEAD : $current_local_commit, exiting..."
+              echo "$alert_msg"
+              alert_notification $alert_email "$alert_msg"
+              exit 1
+          fi
+
+          echo "Commit currently running on production : $current_local_commit"
+          echo "Commit currently on remote : $current_remote_commit"
+
+          # Prep the pre prod folder
+          check_clear_folder=`ssh -l $destination_user $destination_host "rm -rf $pre_prod_dir"`
+          sanity_check $? "Error with cleaning pre prod folder : $check_clear_folder"
+
+          # Clone files from the repo in prod prep folder, set permissions and rsync files from live site
+          ssh -l $destination_user $destination_host \
+              "mkdir $pre_prod_dir &&\
+              cd $pre_prod_dir &&\
+              git clone $git_repo . &&\
+              rsync --ignore-existing -razp --progress --exclude '.git' --exclude '.npm' --exclude 'node_modules' --exclude 'vendor' --exclude '.cache' ${destination_dir}/ ${pre_prod_dir} &&\
+              chown -R ${user_perm}:${group_perm} ${pre_prod_dir}"
+
+          # Sanity checks
+          check_composer_install=`ssh -l $destination_user $destination_host "cd $pre_prod_dir;/usr/local/bin/composer install --no-interaction --prefer-dist --optimize-autoloader"`
+          sanity_check $? "Error with composer update on production : $check_composer_install"
+
+          # Sanity checks before actually pushing live
+          check_npm_install=`ssh -l $destination_user $destination_host "cd $pre_prod_dir;npm i"`
+          sanity_check $? "Error with NPM install pacakge on production : $check_npm_install"
+
+          check_npm_run=`ssh -l $destination_user $destination_host "cd $pre_prod_dir;npm run dev"`
+          sanity_check $? "Error with NPM run dev on production : $check_npm_run"
+
+          check_move_preprod=`ssh -l $destination_user $destination_host "mv $pre_prod_dir ${destination_dir}_${current_remote_commit}"`
+          sanity_check $? "Error with moving pre-prod folder to cluster folder : $check_move_preprod"
+
+          ssh -l $destination_user $destination_host \
+              "cd ${destination_dir}_${current_remote_commit};\
+              $gen_docs_cmd;\
+              php artisan clear-compiled;\
+              php artisan cache:clear;\
+              php artisan route:clear;\
+              php artisan route:cache;\
+              php artisan view:clear;\
+              php artisan config:clear;\
+              php artisan config:cache"
+
+          check_force_symlink=`ssh -l $destination_user $destination_host "ln -sf ${destination_dir}_${current_remote_commit} ${$destination_dir}"`
+          sanity_check $? "Error with creating symlink to newly pushed folder : $check_force_symlink"
+
+          # Remove all folders except the current and previous commit folders as well as the symlink
+          ssh -l $destination_user $destination_host \
+              "find ${dest_dir_root} -type d -not \( -name '${destination_dir}' -or -name '${destination_dir}_{$current_remote_commit}' -or -name '${destination_dir}_${current_local_commit}' \) -delete"
+
+          # We dont run unit tests on production
+          echo "" > ${item_rootdir}/tests/results/${destination_project}_test1.xml
+          echo "" > ${item_rootdir}/tests/results/${destination_project}_test2.xml
+
+      else
+          echo "Invalid branch provided : $destination_branch"
+          exit 1
+      fi
+    ;;
+  ##################################################################
+  Rollback-Previous)
+      echo "Status:$Status"
+      echo "Previous to be starting to Rollback"
+      if [ "$destination_branch" == "master" ]
+      then
+          ssh -l $destination_user $destination_host \
+              -o PasswordAuthentication=no    \
+              -o StrictHostKeyChecking=no     \
+              -o UserKnownHostsFile=/dev/null \
+              -p 2225                         \
+              -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
+             "bash /var/www/$currentScriptDir/stagingGitlabDeploy/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id;"
+      else
+          echo "Invalid branch provided : $destination_branch to Rollback"
+          exit 1
+      fi
+      ;;
+    Rollback)
+      echo "Status:$Status"
+      echo "Version:$Version to be starting to Rollback"
+      if [ "$destination_branch" == "master" ]
+      then
+          ssh -l $destination_user $destination_host \
+              -o PasswordAuthentication=no    \
+              -o StrictHostKeyChecking=no     \
+              -o UserKnownHostsFile=/dev/null \
+              -p 2225                         \
+              -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
+             "bash /var/www/$currentScriptDir/stagingGitlabDeploy/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id $Version;"
+      else
+          echo "Invalid branch provided : $destination_branch to Rollback"
+          exit 1
+      fi
+      ;;
+  ##################################################################################
+  *)
+  exit
+      ;;
+esac
 ##################################################################################
