@@ -88,10 +88,10 @@ case $Status  in
               REMOTE=\$(git ls-remote \$(git rev-parse --abbrev-ref @{u} | \sed 's/\// /g') | cut -f1);\
                 echo \"REMOTE is \$REMOTE\";\
               if [[ \$LOCAL != \$REMOTE ]] || [[ -z \$REMOTE ]] ; then \
-        bash /var/www/$currentScriptDir/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
-        bash /var/www/$currentScriptDir/laravel-flow/artisan-command.sh $destination_dir; \
-        bash /var/www/$currentScriptDir/tag-handle/createTag.sh $destination_dir $tg_chat_group_id; \
-        bash /var/www/$currentScriptDir/tag-handle/deletetag.sh $destination_dir; \
+        bash /var/www/$currentScriptDir/localGitlabDeploy/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
+        bash /var/www/$currentScriptDir/localGitlabDeploy/laravel-flow/artisan-command.sh $destination_dir; \
+        bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/createTag.sh $destination_dir $tg_chat_group_id; \
+        bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/deletetag.sh $destination_dir; \
 else\
     echo \"Nothing to do\";
 fi;\
@@ -214,7 +214,7 @@ fi;\
               -o UserKnownHostsFile=/dev/null \
               -p 2225                         \
               -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
-             "bash /var/www/$currentScriptDir/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id;"
+             "bash /var/www/$currentScriptDir/localGitlabDeploy/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id;"
       else
           echo "Invalid branch provided : $destination_branch to Rollback"
           exit 1
@@ -231,7 +231,7 @@ fi;\
               -o UserKnownHostsFile=/dev/null \
               -p 2225                         \
               -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
-             "bash /var/www/$currentScriptDir/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id $Version;"
+             "bash /var/www/$currentScriptDir/localGitlabDeploy/submodule/revert.sh $destination_dir $currentScriptDir $tg_chat_group_id $Version;"
       else
           echo "Invalid branch provided : $destination_branch to Rollback"
           exit 1
