@@ -83,7 +83,7 @@ function createCommitMessage()
     # make newlines the only separator
     set -f
     IFS=$'\n'
-    listsTag=$(git log $previousTag..HEAD --oneline --date=default-local --pretty='format:%Hê%sê%adê%anê<%ae>'| git name-rev --stdin)
+    listsTag=$(git log "$previousTag"..HEAD --oneline --date=default-local --pretty='format:%Hê%sê%adê%anê<%ae>'| git name-rev --stdin)
 #    echo "current Tag is $listsTag"
     i=0
     for line in $listsTag

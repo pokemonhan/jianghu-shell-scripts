@@ -89,6 +89,7 @@ case $Status  in
                 echo \"REMOTE is \$REMOTE\";\
               if [[ \$LOCAL != \$REMOTE ]] || [[ -z \$REMOTE ]] ; then \
         previousTag=\"\$(git describe --abbrev=0)\";\
+        echo \"current Tag is \$previousTag\";\
         bash /var/www/$currentScriptDir/stagingGitlabDeploy/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
         bash /var/www/$currentScriptDir/stagingGitlabDeploy/laravel-flow/artisan-command.sh $destination_dir; \
         bash /var/www/$currentScriptDir/stagingGitlabDeploy/tag-handle/createTag.sh $destination_dir $tg_chat_group_id \$previousTag; \
