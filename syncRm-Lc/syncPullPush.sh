@@ -1,7 +1,6 @@
 #!/bin/sh
-cd /e;
-syncDirectory=/var/www/tmp/syncDir;
-input="syncRm-Lc/syncPrjs.txt"
+syncDirectory="/var/www/tmp/syncDir";
+input="/var/www/shell-scripts/syncRm-Lc/syncPrjs.txt"
 
 function gitParamRetrieve()
 {
