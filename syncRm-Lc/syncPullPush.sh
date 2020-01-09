@@ -40,8 +40,8 @@ function checkandSetUrl()
 	local ProjectName="$1"
 	local LocalGitlab="$2"
 	local RMGitlab="$3"
-	git config user.name server
-    git config user.email server@jianghu.com
+	git config --global user.name server
+    git config --global user.email server@jianghu.com
     git config core.fileMode false
     gitRMURLDetail=$(git remote -v)
     echo "before is $gitRMURLDetail"
