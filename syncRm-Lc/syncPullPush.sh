@@ -48,13 +48,14 @@ function checkandSetUrl()
 	git remote set-url origin $RMGitlab
 	gitRMURLDetail=$(git remote -v)
     echo "After is $gitRMURLDetail"
-	pushOrPullAction $ProjectName
+	pushOrPullAction $ProjectName $LocalGitlab
 	git remote set-url origin $LocalGitlab
 }
 
 function pushOrPullAction()
 {
   local ProjectName="$1"
+  local LocalGitlab="$2"
   #项目同步发版通知
   local tg_chat_group_id='-1001457674977';
    remoteUpdate=$(git remote -v update)
@@ -72,14 +73,17 @@ function pushOrPullAction()
 	    echo "Up-to-date"
 	elif [[ $LOCAL == $BASE ]]; then
 	    echo "Need to pull"
-	    git pull
+	    pulling=$(git pull)
+	    echo $pulling
 	    cd /var/www/telegram-bot-bash;
       export BASHBOT_HOME="$(pwd)";
       source ./bashbot.sh source;
       startEmoji="🤩";
       telegrammsg="$startEmoji [ 项目 $ProjectName 已从外网同步到本地gitlab ]$startEmoji\n\n";
       send_message "$tg_chat_group_id" "$telegrammsg";
-	    git push
+      git remote set-url origin $LocalGitlab
+	    pushing=$(git push)
+	    echo $pushing
 	elif [[ $REMOTE == $BASE ]]; then
 	    echo "Need to push"
 	else
