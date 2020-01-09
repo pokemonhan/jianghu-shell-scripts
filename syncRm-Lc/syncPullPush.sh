@@ -24,31 +24,40 @@ function gitSyncDirectory()
 		 echo $output
 	fi
 	cd "$syncDirectory/$ProjectName"
-	checkandSetUrl $LocalGitlab $RMGitlab
+	checkandSetUrl $ProjectName $LocalGitlab $RMGitlab
 }
 
 function checkandSetUrl()
 {
-	LocalGitlab="$1"
-	RMGitlab="$2"
+	ProjectName="$1"
+	LocalGitlab="$2"
+	RMGitlab="$3"
 	gitRMURLDetail=$(git remote -v)
 	git remote set-url origin $RMGitlab
-	pushOrPullAction
+	pushOrPullAction $ProjectName
 	git remote set-url origin $LocalGitlab
 }
 
 function pushOrPullAction()
 {
+  ProjectName="$1"
+  tg_chat_group_id='-354077748';
 	UPSTREAM=${1:-'@{u}'}
 	LOCAL=$(git rev-parse @)
-	REMOTE=$(git rev-parse "$UPSTREAM")
-	BASE=$(git merge-base @ "$UPSTREAM")
+  REMOTE=$(git rev-parse "$UPSTREAM")
+  BASE=$(git merge-base @ "$UPSTREAM")
 
 	if [ $LOCAL = $REMOTE ]; then
 	    echo "Up-to-date"
 	elif [ $LOCAL = $BASE ]; then
 	    echo "Need to pull"
 	    git pull
+	    cd /var/www/telegram-bot-bash;
+      export BASHBOT_HOME="$(pwd)";
+      source ./bashbot.sh source;
+      startEmoji="🤩";
+      telegrammsg="$startEmoji [ 项目 $ProjectName 已从外网同步到本地gitlab ]$startEmoji\n\n";
+      send_message "$tg_chat_group_id" "$telegrammsg";
 	    git push
 	elif [ $REMOTE = $BASE ]; then
 	    echo "Need to push"
