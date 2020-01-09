@@ -41,7 +41,8 @@ function checkandSetUrl()
 function pushOrPullAction()
 {
   ProjectName="$1"
-  tg_chat_group_id='-354077748';
+  #项目同步发版通知
+  tg_chat_group_id='-1001457674977';
 	UPSTREAM=${1:-'@{u}'}
 	LOCAL=$(git rev-parse @)
   REMOTE=$(git rev-parse "$UPSTREAM")
