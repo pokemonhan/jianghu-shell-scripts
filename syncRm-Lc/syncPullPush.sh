@@ -1,6 +1,9 @@
 #!/bin/sh
 syncDirectory="/var/www/tmp/syncDir";
-input="/var/www/shell-scripts/syncRm-Lc/syncPrjs.txt"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo $dir;
+#currentScriptDir="${dir##*/}";
+input="$dir/syncPrjs.txt"
 
 function gitParamRetrieve()
 {
@@ -34,6 +37,8 @@ function checkandSetUrl()
 	RMGitlab="$3"
 	gitRMURLDetail=$(git remote -v)
 	git remote set-url origin $RMGitlab
+	git config user.name server
+    git config user.email server@jianghu.com
 	pushOrPullAction $ProjectName
 	git remote set-url origin $LocalGitlab
 }
