@@ -57,6 +57,8 @@ function pushOrPullAction()
   local ProjectName="$1"
   #项目同步发版通知
   local tg_chat_group_id='-1001457674977';
+   remoteUpdate=$(git remote -v update)
+	 echo $remoteUpdate
 #    UPSTREAM=${1:-'@{u}'}
     local UPSTREAM='@{u}'
     echo "upstream is $UPSTREAM"
