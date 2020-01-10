@@ -1,7 +1,7 @@
 #!/bin/sh
 syncDirectory="/var/www/tmp/syncDir";
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-echo $dir;
+#echo $dir;
 #currentScriptDir="${dir##*/}";
 input="$dir/syncPrjs.txt"
 
@@ -28,7 +28,7 @@ function gitSyncDirectory()
 		 mkdir -m 777 -p "$syncDirectory/$ProjectName"
 #		 mkdir -p "$syncDirectory/$ProjectName"
 		 output=$(git clone "$LocalGitlab" "$syncDirectory/$ProjectName")
-		 echo $output
+#		 echo $output
 	fi
 	cd "$syncDirectory/$ProjectName"
 	chmod -R 777 "$syncDirectory/$ProjectName"
@@ -44,12 +44,12 @@ function checkandSetUrl()
     git config --global user.email server@jianghu.com
     git config core.fileMode false
     gitRMURLDetail=$(git remote -v)
-    echo "before is $gitRMURLDetail"
-	git remote set-url origin $RMGitlab
+#    echo "before is $gitRMURLDetail"
+	git remote set-url origin "$RMGitlab"
 	gitRMURLDetail=$(git remote -v)
-    echo "After is $gitRMURLDetail"
-	pushOrPullAction $ProjectName $LocalGitlab
-	git remote set-url origin $LocalGitlab
+#    echo "After is $gitRMURLDetail"
+	pushOrPullAction "$ProjectName" "$LocalGitlab"
+	git remote set-url origin "$LocalGitlab"
 }
 
 function pushOrPullAction()
@@ -59,31 +59,40 @@ function pushOrPullAction()
   #项目同步发版通知
   local tg_chat_group_id='-1001457674977';
    remoteUpdate=$(git remote -v update)
-	 echo $remoteUpdate
+#	 echo $remoteUpdate
 #    UPSTREAM=${1:-'@{u}'}
     local UPSTREAM='@{u}'
-    echo "upstream is $UPSTREAM"
+#    echo "upstream is $UPSTREAM"
     local LOCAL=$(git rev-parse @)
-    echo "LOCAL is $LOCAL"
+#    echo "LOCAL is $LOCAL"
     local REMOTE=$(git rev-parse "$UPSTREAM")
-    echo "REMOTE is $REMOTE"
+#    echo "REMOTE is $REMOTE"
     local BASE=$(git merge-base @ "$UPSTREAM")
-    echo "BASE is $BASE"
+#    echo "BASE is $BASE"
 	if [[ $LOCAL == $REMOTE ]]; then
-	    echo "Up-to-date"
+	     upd="up-to-date"
+#	    echo "Up-to-date"
 	elif [[ $LOCAL == $BASE ]]; then
 	    echo "Need to pull"
-	    pulling=$(git pull)
+#	    pulling=$(git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --recurse-submodules=no --progress --prune)
+        pulling=$(git pull)
 	    echo $pulling
-	    cd /var/www/telegram-bot-bash;
-      export BASHBOT_HOME="$(pwd)";
-      source ./bashbot.sh source;
+#	    cd /var/www/telegram-bot-bash;
+#      export BASHBOT_HOME="$(pwd)";
+      echo "exported"
+      me=$(whoami)
+      echo "me is $me"
+#      ./bashbot.sh init
+#      source ./bashbot.sh source;
+      echo "sourced"
       startEmoji="🤩";
       telegrammsg="$startEmoji [ 项目 $ProjectName 已从外网同步到本地gitlab ]$startEmoji\n\n";
-      send_message "$tg_chat_group_id" "$telegrammsg";
-      git remote set-url origin $LocalGitlab
-	    pushing=$(git push)
-	    echo $pushing
+      echo "msg is $telegrammsg"
+#      send_message "$tg_chat_group_id" "$telegrammsg";
+      git remote set-url origin "$LocalGitlab"
+      pushing=$(git push)
+#	  pushing=$(git -c credential.helper= -c core.quotepath=false -c log.showSignature=false push --progress --porcelain origin refs/heads/master:master)
+	  echo $pushing
 	elif [[ $REMOTE == $BASE ]]; then
 	    echo "Need to push"
 	else
