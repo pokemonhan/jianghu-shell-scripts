@@ -88,9 +88,11 @@ case $Status  in
               REMOTE=\$(git ls-remote \$(git rev-parse --abbrev-ref @{u} | \sed 's/\// /g') | cut -f1);\
                 echo \"REMOTE is \$REMOTE\";\
               if [[ \$LOCAL != \$REMOTE ]] || [[ -z \$REMOTE ]] ; then \
+        previousTag=\"\$(git describe --abbrev=0)\";\
+        echo \"current Tag is \$previousTag\";\
         bash /var/www/$currentScriptDir/localGitlabDeploy/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
         bash /var/www/$currentScriptDir/localGitlabDeploy/laravel-flow/artisan-command.sh $destination_dir; \
-        bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/createTag.sh $destination_dir $tg_chat_group_id; \
+        bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/createTag.sh $destination_dir $tg_chat_group_id \$previousTag; \
         bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/deletetag.sh $destination_dir; \
 else\
     echo \"Nothing to do\";

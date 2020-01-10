@@ -1,8 +1,9 @@
 #!/bin/sh
 destination_dir="$1"
 tg_chat_group_id="$2"
+previousTag="$3"
 cd "$destination_dir"
-previousTag="$(git describe --abbrev=0)"
+
 #Increment Function to string with pre zero and integer
 function incnumstr()
 {
@@ -78,10 +79,11 @@ function echoCommitMessage()
 #create Commit Message
 function createCommitMessage()
 {
+  previousTag="$1"
     # make newlines the only separator
     set -f
     IFS=$'\n'
-    listsTag=$(git log $(git describe --tags --abbrev=0)..HEAD --oneline --date=default-local --pretty='format:%Hê%sê%adê%anê<%ae>'| git name-rev --stdin)
+    listsTag=$(git log "$previousTag"..HEAD --oneline --date=default-local --pretty='format:%Hê%sê%adê%anê<%ae>'| git name-rev --stdin)
 #    echo "current Tag is $listsTag"
     i=0
     for line in $listsTag
@@ -93,7 +95,7 @@ function createCommitMessage()
     # disable globbing
 }
 
-message="$(createCommitMessage)"
+message="$(createCommitMessage $previousTag)"
 echo tag message now is ${message};
 #################【 createing Verson Number 】########################
 #previousTag='V-JH-20200301001-253'
