@@ -43,6 +43,7 @@ echo "isSeed is now $isSeed"
 rm -rf composer.lock;
 /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;
 php artisan clear-compiled;
+php artisan lang:publish zh-CN --force;
 case $isSeed in
   1|2)
    php artisan migrate:fresh --seed;
