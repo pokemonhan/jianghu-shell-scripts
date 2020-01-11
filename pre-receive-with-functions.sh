@@ -258,7 +258,9 @@ function writefile() {
   #        mv "$currentfile.txt" "$currentfile"
           echo "current file is $currentfile"
 		    fi
-
+          if [ ! -f "${currentDir}/composer.json" ]; then
+            ln -s ${currentDir}/jianghu_entertain_composer/composer.json ${currentDir}/composer.json;
+          fi
 #        cat $currentfile;
 }
 
@@ -342,9 +344,6 @@ EOL
         git reset --hard;\
         git fetch --all;\
         git pull origin master;\
-        if [ ! -f \"${currentDir}/composer.json\" ]; then \
-            ln -s ${currentDir}/jianghu_entertain_composer/composer.json ${currentDir}/composer.json;\
-        fi;\
         chmod -R 777 $currentDir;\
      "
   ###########################################################
