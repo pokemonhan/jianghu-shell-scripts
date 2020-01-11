@@ -16,11 +16,14 @@ git pull origin $destination_branch;
     url = ssh://git@${destination_host}:2289/php/phpcs-rule.git
 [submodule "jianghu_entertain_composer"]
 	path = jianghu_entertain_composer
-	url = ssh://git@{destination_host}:2289/php/jianghu_entertain_composer.git
+	url = ssh://git@${destination_host}:2289/php/jianghu_entertain_composer.git
 EOL
         chmod 777 ${destination_dir}/.gitmodules;
         if [[ ! -e ${destination_dir}/phpcs-rule ]]; then
             git submodule add -f ssh://git@${destination_host}:2289/php/phpcs-rule.git phpcs-rule;
+        fi;
+        if [[ ! -e ${destination_dir}/jianghu_entertain_composer ]]; then
+            git submodule add -f ssh://git@${destination_host}:2289/php/jianghu_entertain_composer.git jianghu_entertain_composer;
         fi;
         git submodule init;
         git submodule sync;

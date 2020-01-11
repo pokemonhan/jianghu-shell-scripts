@@ -323,10 +323,16 @@ do
 [submodule \"phpcs-rule\"]
     path = phpcs-rule
     url = ssh://git@${destination_host}:2289/php/phpcs-rule.git
+[submodule \"jianghu_entertain_composer\"]
+	path = jianghu_entertain_composer
+	url = ssh://git@${destination_host}:2289/php/jianghu_entertain_composer.git
 EOL
         chmod 777 ${currentDir}/.gitmodules;\
         if [[ ! -e ${currentDir}/phpcs-rule ]]; then \
             git submodule add -f ssh://git@${destination_host}:2289/php/phpcs-rule.git phpcs-rule;\
+        fi;\
+        if [[ ! -e ${currentDir}/jianghu_entertain_composer ]]; then \
+            git submodule add -f ssh://git@${destination_host}:2289/php/jianghu_entertain_composer.git jianghu_entertain_composer;\
         fi;\
         git submodule init;\
         git submodule sync;\
@@ -336,6 +342,7 @@ EOL
         git reset --hard;\
         git fetch --all;\
         git pull origin master;\
+        ln -s ${currentDir}/jianghu_entertain_composer/composer.json ${currentDir}/composer.json
         chmod -R 777 $currentDir;\
      "
   ###########################################################
