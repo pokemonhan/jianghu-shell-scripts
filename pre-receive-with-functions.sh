@@ -342,7 +342,9 @@ EOL
         git reset --hard;\
         git fetch --all;\
         git pull origin master;\
-        ln -s ${currentDir}/jianghu_entertain_composer/composer.json ${currentDir}/composer.json
+        if [ ! -f \"${currentDir}/composer.json\" ]; then \
+            ln -s ${currentDir}/jianghu_entertain_composer/composer.json ${currentDir}/composer.json;\
+        fi;\
         chmod -R 777 $currentDir;\
      "
   ###########################################################
