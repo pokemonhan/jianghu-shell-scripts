@@ -41,6 +41,7 @@ cd "$destination_dir"
 checkIfMigration
 echo "isSeed is now $isSeed"
 rm -rf composer.lock;
+ln -s ../jianghu_entertain_composer/composer.json composer.json
 /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;
 php artisan clear-compiled;
 php artisan lang:publish zh-CN --force;
