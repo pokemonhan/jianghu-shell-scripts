@@ -27,6 +27,10 @@ shareprj='/var/www/shareprj';
 tailPath='site/jianghu_entertain';
 destination_host='172.19.0.1';
 destination_user='root';
+#get current script directory dynamically
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo $dir;
+currentScriptDir="${dir##*/}";
 case $BUILD_USER_FIRST_NAME in
    "Harris")
    dirUser="harris";
@@ -62,6 +66,7 @@ case $Type  in
                   -p 2225                         \
                   -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                  "cd $destination_dir;\
+                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
                  /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
                   php artisan clear-compiled;\
                   php artisan cache:clear;\
@@ -76,6 +81,8 @@ case $Type  in
                   echo ow is \$OWNER;\
                   echo gp is \$GROUP;\
                   chown -R \$OWNER:\$GROUP $destination_dir/*;\
+                  rm -rf $destination_dir/jianghu_entertain_composer ;\
+                  rm -f $destination_dir/composer.json;\
 "
     ##################################################################
     ;;
@@ -91,6 +98,7 @@ case $Type  in
                   -p 2225                         \
                   -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                  "cd $destination_dir;\
+                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
                  /usr/local/bin/composer update --no-interaction --no-progress --no-ansi;\
                   php artisan clear-compiled;\
                   php artisan config:cache;\
@@ -103,6 +111,8 @@ case $Type  in
                   echo ow is \$OWNER;\
                   echo gp is \$GROUP;\
                   chown -R \$OWNER:\$GROUP $destination_dir/*;\
+                  rm -rf $destination_dir/jianghu_entertain_composer ;\
+                  rm -f $destination_dir/composer.json;\
 "
   ;;
   "Clear Cache")
@@ -117,6 +127,7 @@ case $Type  in
                         -p 2225                         \
                         -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                        "cd $destination_dir;\
+                       bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
                         php artisan clear-compiled;\
                         php artisan cache:clear;\
                         php artisan route:cache;\
@@ -130,6 +141,8 @@ case $Type  in
                        echo ow is \$OWNER;\
                        echo gp is \$GROUP;\
                        chown -R \$OWNER:\$GROUP $destination_dir/*;\
+                       rm -rf $destination_dir/jianghu_entertain_composer ;\
+                       rm -f $destination_dir/composer.json;\
 "
   ;;
 
@@ -162,6 +175,7 @@ case $Type  in
                       -p 2225                         \
                       -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                      "cd $destination_dir;\
+                     bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
                      /usr/local/bin/composer dump-autoload;\
                      chmod -R 777 ${destination_dir}/storage;\
                      chmod -R 777 ${destination_dir}/vendor;\
@@ -172,6 +186,8 @@ case $Type  in
                      echo ow is \$OWNER;\
                      echo gp is \$GROUP;\
                      chown -R \$OWNER:\$GROUP $destination_dir/*;\
+                     rm -rf $destination_dir/jianghu_entertain_composer ;\
+                     rm -f $destination_dir/composer.json;\
                       "
     ;;
   "Create Action")
@@ -195,6 +211,7 @@ fi
                           -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
                          $ActionCommand;\
+                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
                          /usr/local/bin/composer dump-autoload;\
                          chmod -R 777 ${destination_dir}/storage;\
                          chmod -R 777 ${destination_dir}/vendor;\
@@ -205,6 +222,8 @@ fi
                          echo ow is \$OWNER;\
                          echo gp is \$GROUP;\
                          chown -R \$OWNER:\$GROUP $destination_dir/*;\
+                         rm -rf $destination_dir/jianghu_entertain_composer ;\
+                         rm -f $destination_dir/composer.json;\
 "
   ;;
   "Manual")
@@ -220,6 +239,7 @@ fi
                           -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
                          $ArtisanCommand;\
+                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
                          chmod -R 777 ${destination_dir}/storage;\
                          chmod -R 777 ${destination_dir}/vendor;\
                          GET_COMMAND=\"ls -ld $destination_dir\";\
@@ -229,6 +249,8 @@ fi
                          echo ow is \$OWNER;\
                          echo gp is \$GROUP;\
                          chown -R \$OWNER:\$GROUP $destination_dir/*;\
+                         rm -rf $destination_dir/jianghu_entertain_composer ;\
+                         rm -f $destination_dir/composer.json;\
 "
   ;;
   "Delete")

@@ -32,3 +32,8 @@ EOL
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;
         git pull origin master;
+        chmod 777 ${destination_dir}/jianghu_entertain_composer;
+        cd ${destination_dir}/jianghu_entertain_composer;
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;
+        git pull origin master;
