@@ -259,7 +259,7 @@ function writefile() {
           echo "current file is $currentfile"
 		    fi
           if [ ! -f "${currentDir}/composer.json" ]; then
-            ln -s ${currentDir}/jianghu_entertain_composer/composer.json ${currentDir}/composer.json;
+            cp ${currentDir}/jianghu_entertain_composer/composer.json ${currentDir}/composer.json;
           fi
 #        cat $currentfile;
 }
