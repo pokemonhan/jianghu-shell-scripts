@@ -82,7 +82,7 @@ case $Type  in
                   echo gp is \$GROUP;\
                   chown -R \$OWNER:\$GROUP $destination_dir/*;\
                   rm -rf $destination_dir/jianghu_entertain_composer ;\
-                  rm -f $destination_dir/composer.json;\
+                  rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
     ##################################################################
     ;;
@@ -112,7 +112,7 @@ case $Type  in
                   echo gp is \$GROUP;\
                   chown -R \$OWNER:\$GROUP $destination_dir/*;\
                   rm -rf $destination_dir/jianghu_entertain_composer ;\
-                  rm -f $destination_dir/composer.json;\
+                  rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
   ;;
   "Clear Cache")
@@ -142,7 +142,7 @@ case $Type  in
                        echo gp is \$GROUP;\
                        chown -R \$OWNER:\$GROUP $destination_dir/*;\
                        rm -rf $destination_dir/jianghu_entertain_composer ;\
-                       rm -f $destination_dir/composer.json;\
+                       rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
   ;;
 
@@ -187,7 +187,7 @@ case $Type  in
                      echo gp is \$GROUP;\
                      chown -R \$OWNER:\$GROUP $destination_dir/*;\
                      rm -rf $destination_dir/jianghu_entertain_composer ;\
-                     rm -f $destination_dir/composer.json;\
+                     rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
                       "
     ;;
   "Create Action")
@@ -223,7 +223,7 @@ fi
                          echo gp is \$GROUP;\
                          chown -R \$OWNER:\$GROUP $destination_dir/*;\
                          rm -rf $destination_dir/jianghu_entertain_composer ;\
-                         rm -f $destination_dir/composer.json;\
+                         rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
   ;;
   "Manual")
@@ -250,7 +250,7 @@ fi
                          echo gp is \$GROUP;\
                          chown -R \$OWNER:\$GROUP $destination_dir/*;\
                          rm -rf $destination_dir/jianghu_entertain_composer ;\
-                         rm -f $destination_dir/composer.json;\
+                         rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
   ;;
   "Delete")
