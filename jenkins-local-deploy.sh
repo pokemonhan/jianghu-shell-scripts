@@ -66,7 +66,7 @@ case $Type  in
                   -p 2225                         \
                   -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                  "cd $destination_dir;\
-                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
+                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
                  /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
                   php artisan clear-compiled;\
                   php artisan cache:clear;\
@@ -81,7 +81,6 @@ case $Type  in
                   echo ow is \$OWNER;\
                   echo gp is \$GROUP;\
                   chown -R \$OWNER:\$GROUP $destination_dir/*;\
-                  rm -rf $destination_dir/jianghu_entertain_composer ;\
                   rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
     ##################################################################
@@ -98,7 +97,7 @@ case $Type  in
                   -p 2225                         \
                   -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                  "cd $destination_dir;\
-                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
+                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
                  /usr/local/bin/composer update --no-interaction --no-progress --no-ansi;\
                   php artisan clear-compiled;\
                   php artisan config:cache;\
@@ -111,7 +110,6 @@ case $Type  in
                   echo ow is \$OWNER;\
                   echo gp is \$GROUP;\
                   chown -R \$OWNER:\$GROUP $destination_dir/*;\
-                  rm -rf $destination_dir/jianghu_entertain_composer ;\
                   rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
   ;;
@@ -127,7 +125,7 @@ case $Type  in
                         -p 2225                         \
                         -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                        "cd $destination_dir;\
-                       bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
+                       bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
                         php artisan clear-compiled;\
                         php artisan cache:clear;\
                         php artisan route:cache;\
@@ -141,7 +139,6 @@ case $Type  in
                        echo ow is \$OWNER;\
                        echo gp is \$GROUP;\
                        chown -R \$OWNER:\$GROUP $destination_dir/*;\
-                       rm -rf $destination_dir/jianghu_entertain_composer ;\
                        rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
   ;;
@@ -175,7 +172,7 @@ case $Type  in
                       -p 2225                         \
                       -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                      "cd $destination_dir;\
-                     bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
+                     bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
                      /usr/local/bin/composer dump-autoload;\
                      chmod -R 777 ${destination_dir}/storage;\
                      chmod -R 777 ${destination_dir}/vendor;\
@@ -186,7 +183,6 @@ case $Type  in
                      echo ow is \$OWNER;\
                      echo gp is \$GROUP;\
                      chown -R \$OWNER:\$GROUP $destination_dir/*;\
-                     rm -rf $destination_dir/jianghu_entertain_composer ;\
                      rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
                       "
     ;;
@@ -211,7 +207,7 @@ fi
                           -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
                          $ActionCommand;\
-                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
+                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
                          /usr/local/bin/composer dump-autoload;\
                          chmod -R 777 ${destination_dir}/storage;\
                          chmod -R 777 ${destination_dir}/vendor;\
@@ -222,7 +218,6 @@ fi
                          echo ow is \$OWNER;\
                          echo gp is \$GROUP;\
                          chown -R \$OWNER:\$GROUP $destination_dir/*;\
-                         rm -rf $destination_dir/jianghu_entertain_composer ;\
                          rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
   ;;
@@ -239,7 +234,7 @@ fi
                           -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
                          $ArtisanCommand;\
-                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_branch $destination_host; \
+                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
                          chmod -R 777 ${destination_dir}/storage;\
                          chmod -R 777 ${destination_dir}/vendor;\
                          GET_COMMAND=\"ls -ld $destination_dir\";\
@@ -249,7 +244,6 @@ fi
                          echo ow is \$OWNER;\
                          echo gp is \$GROUP;\
                          chown -R \$OWNER:\$GROUP $destination_dir/*;\
-                         rm -rf $destination_dir/jianghu_entertain_composer ;\
                          rm -f $destination_dir/composer.json $destination_dir/composer.lock;\
 "
   ;;
