@@ -30,7 +30,6 @@ igDir10="$PROJ_DIR/.idea"
 # execDirConfigFile
 # find $PROJ_DIR -type f
 
-#create Commit Message
 function execEachFile()
 {
     # make newlines the only separator
@@ -78,10 +77,8 @@ function analyzeFile()
           echo "$analyzResult" >> /var/www/tmp/$newfileNew.log
           #Send Telegram Message to Specific Group
 #          https://github.com/topkecleon/telegram-bot-bash
-          cd /var/www/telegram-bot-bash;
-          export BASHBOT_HOME="$(pwd)";
-          source ./bashbot.sh source;
-          send_file '-365299766' "/var/www/tmp/$newfileNew.log" ''
+#          https://github.com/rahiel/telegram-send
+          telegram-send --file "/var/www/tmp/$newfileNew.log"
         fi
 }
 
