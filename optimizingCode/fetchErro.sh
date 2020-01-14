@@ -64,20 +64,25 @@ function analyzeFile()
 	# echo "filename is $file"
 	#original /e/projects/jianghu_entertain/.editorconfig
 	#to get .editorconfig
-	local currentfilePath=$(echo "$1"| cut -d '/' -f5-)
-	local newfileNew="$(echo "$currentfilePath" | sed s:/:__:g)"
+	currentfilePath=$(echo "$1"| cut -d '/' -f5-)
+	newfileNew="$(echo "$currentfilePath" | sed s:/:__:g)"
 	echo "$newfileNew"
 	# echo "$(realpath ${1} | sed s:/:__:g)"
-	local analyzResult=$(/var/www/jianghu_entertain/vendor/bin/phpcs --standard="/var/www/jianghu_entertain/phpcs-rule/phpcs.xml" "$1")
-	local EXIT_STATUS=$?
+	analyzResult=$(/var/www/jianghu_entertain/vendor/bin/phpcs --standard="/var/www/jianghu_entertain/phpcs-rule/phpcs.xml" "$1")
+	EXIT_STATUS=$?
 #  /var/www/jianghu_entertain/vendor/bin/phpcs --standard="/var/www/jianghu_entertain/phpcs-rule/phpcs.xml" "$1"
         echo "exist status is $EXIT_STATUS"
         if [ "$EXIT_STATUS" -eq "0" ]; then
           echo "\t\033[32mPHPCS Passed: $1\033[0m result"
         else
           echo "$analyzResult" >> /var/www/tmp/$newfileNew.log
+          #Send Telegram Message to Specific Group
+#          https://github.com/topkecleon/telegram-bot-bash
+          cd /var/www/telegram-bot-bash;
+          export BASHBOT_HOME="$(pwd)";
+          source ./bashbot.sh source;
+          send_file '-365299766' "/var/www/tmp/$newfileNew.log" ''
         fi
-
 }
 
 cd $PROJ_DIR
