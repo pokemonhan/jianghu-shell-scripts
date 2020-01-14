@@ -57,6 +57,21 @@ function execEachFile()
     # disable globbing
 }
 
+function echoCommitMessage()
+{
+#        echo here is in merge "$1";
+#    7173111c6b3aace21a723bdbc661f8ff04faa9aeê:tada: 打tag 远程更新时本地需要从目前最低版本打 tag bug 修复êFri Jan 10 10:07:19 2020 +0800êHarrisê
+    set -f; IFS='ê'
+	  set -- $1
+	# every strange character should use double place
+    normal 	echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8"
+#    echo "$i:来自分支=》$branchName"
+    echo " 信息=》$2"
+    echo " 提交者=》$4"
+    echo " 日期=》$3"
+    set +f; unset IFS
+}
+
 function analyzeFile()
 {
 	# file=${1##*/}
@@ -75,10 +90,14 @@ function analyzeFile()
           echo "\t\033[32mPHPCS Passed: $1\033[0m result"
         else
           echo "$analyzResult" >> /var/www/tmp/$newfileNew.log
+          log=$(git log -n 1 --pretty='format:%Hê%sê%adê%anê' -- "$currentfilePath")
+          msgCaption="$currentfilePath"
+          msgCaption+=$(echoCommitMessage $log)
+#          echo "$msgCaption"
           #Send Telegram Message to Specific Group
 #          https://github.com/topkecleon/telegram-bot-bash
 #          https://github.com/rahiel/telegram-send
-          telegram-send --file "/var/www/tmp/$newfileNew.log"
+          telegram-send --file "/var/www/tmp/$newfileNew.log" --caption "$currentfilePath"
         fi
 }
 
