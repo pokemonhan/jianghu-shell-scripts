@@ -104,6 +104,3 @@ function analyzeFile()
 cd $PROJ_DIR
 git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout develop/harris/original --
 execEachFile
-
-echo Press Enter...
-read
