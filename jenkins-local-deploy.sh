@@ -206,8 +206,8 @@ fi
                           -p 2225                         \
                           -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
-                         $ActionCommand;\
                          bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
+                         $ActionCommand;\
                          /usr/local/bin/composer dump-autoload;\
                          chmod -R 777 ${destination_dir}/storage;\
                          chmod -R 777 ${destination_dir}/vendor;\
@@ -233,8 +233,8 @@ fi
                           -p 2225                         \
                           -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
-                         $ArtisanCommand;\
                          bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
+                         $ArtisanCommand;\
                          chmod -R 777 ${destination_dir}/storage;\
                          chmod -R 777 ${destination_dir}/vendor;\
                          GET_COMMAND=\"ls -ld $destination_dir\";\
