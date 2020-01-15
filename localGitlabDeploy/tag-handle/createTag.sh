@@ -104,7 +104,8 @@ function sendMsgToTgDetail() {
       STRING="$2"
       STRLENGTH=$(echo -n "$STRING" | wc -m)
       echo "length is $STRLENGTH"
-      for (( c=0; c<=$STRLENGTH; c+=500 ))
+      # tg max character 4096
+      for (( c=0; c<=$STRLENGTH; c+=4000 ))
       do
          msg="${STRING:$c:500}"
          echo "now  is $msg\n";
