@@ -103,7 +103,7 @@ function sendMsgToTgDetail() {
       for (( c=1; c<=$STRLENGTH; c+=500 ))
       do
          msg="${STRING:$c:500}"
-         echo "now  is $msg\n"
+         echo "now  is $msg\n";
          send_message "$tg_chat_group_id" "$msg";
       done
 }
@@ -123,5 +123,5 @@ export BASHBOT_HOME="$(pwd)";
 source ./bashbot.sh source;
 startEmoji="🤩";
 telegrammsg="$startEmoji [ 已发布版本:$vno ]$startEmoji\n\n[ 发布摘要 ]:\n$message";
-sendMsgToTgDetail "$tg_chat_group_id" "$telegrammsg"
+sendMsgToTgDetail $tg_chat_group_id $telegrammsg
 #send_message "$tg_chat_group_id" "$telegrammsg";
