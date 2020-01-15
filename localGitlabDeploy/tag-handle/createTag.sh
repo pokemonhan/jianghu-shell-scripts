@@ -99,7 +99,7 @@ function createCommitMessage()
 function sendMsgToTgDetail() {
       tg_chat_group_id="$1"
       STRING="$2"
-      STRLENGTH=$(echo -n $STRING | wc -m)
+      STRLENGTH=$(echo -n "$STRING" | wc -m)
       echo "length is $STRLENGTH"
       for (( c=1; c<=$STRLENGTH; c+=500 ))
       do
@@ -124,5 +124,5 @@ export BASHBOT_HOME="$(pwd)";
 source ./bashbot.sh source;
 startEmoji="🤩";
 telegrammsg="$startEmoji [ 已发布版本:$vno ]$startEmoji\n\n[ 发布摘要 ]:\n$message";
-sendMsgToTgDetail $tg_chat_group_id $telegrammsg
+sendMsgToTgDetail "$tg_chat_group_id" "$telegrammsg"
 #send_message "$tg_chat_group_id" "$telegrammsg";
