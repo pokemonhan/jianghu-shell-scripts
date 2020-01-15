@@ -60,7 +60,8 @@ function echoCommitMessage()
     set -f; IFS='ê'
 	set -- $1
 	# every strange character should use double place
-    #normal 	echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8"
+    #normal
+    echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8 9 is $9, 10 is $10, 12 is $12"
     branchName=$(echo "$1"| cut -d ' ' -f2)
     if [[ $3 != *"Merge"* ]]; then
 #        echo here is in merge "$2";
@@ -98,12 +99,12 @@ function createCommitMessage()
 function sendMsgToTgDetail() {
       tg_chat_group_id="$1"
       STRING="$2"
-      STRLENGTH=$(echo -n $STRING | wc -m)
+      STRLENGTH=$(echo -n "$STRING" | wc -m)
       echo "length is $STRLENGTH"
       for (( c=1; c<=$STRLENGTH; c+=500 ))
       do
          msg="${STRING:$c:500}"
-         echo "now  is ${msg}\n"
+         echo "now  is $msg\n";
          send_message "$tg_chat_group_id" "$msg";
       done
 }
