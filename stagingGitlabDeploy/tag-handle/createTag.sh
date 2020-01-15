@@ -95,6 +95,19 @@ function createCommitMessage()
     # disable globbing
 }
 
+function sendMsgToTgDetail() {
+      tg_chat_group_id="$1"
+      STRING="$2"
+      STRLENGTH=$(echo -n $STRING | wc -m)
+      echo "length is $STRLENGTH"
+      for (( c=1; c<=$STRLENGTH; c+=500 ))
+      do
+         msg="${STRING:$c:500}"
+         echo "now  is ${msg}\n"
+         send_message "$tg_chat_group_id" "$msg";
+      done
+}
+
 message="$(createCommitMessage $previousTag)"
 echo tag message now is ${message};
 #################【 createing Verson Number 】########################
@@ -110,4 +123,4 @@ export BASHBOT_HOME="$(pwd)";
 source ./bashbot.sh source;
 startEmoji="🤩";
 telegrammsg="$startEmoji [ 测试服已同步发布以下功能 ]$startEmoji\n\n[ 发布摘要 ]:\n$message";
-send_message "$tg_chat_group_id" "$telegrammsg";
+sendMsgToTgDetail "$tg_chat_group_id" "$telegrammsg"
