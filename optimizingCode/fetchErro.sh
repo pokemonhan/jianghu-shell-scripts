@@ -16,6 +16,7 @@ igDir7="$PROJ_DIR/tests"
 igDir8="$PROJ_DIR/vendor"
 igDir9="$PROJ_DIR/.git"
 igDir10="$PROJ_DIR/.idea"
+i=0
 
 # input="b.txt"
 # function execDirConfigFile()
@@ -64,7 +65,7 @@ function echoCommitMessage()
     set -f; IFS='ê'
 	  set -- $1
 	# every strange character should use double place
-    normal 	echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8"
+#    normal 	echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8"
 #    echo "$i:来自分支=》$branchName"
     echo " 信息=》$2"
     echo " 提交者=》$4"
@@ -79,26 +80,45 @@ function analyzeFile()
 	#original /e/projects/jianghu_entertain/.editorconfig
 	#to get .editorconfig
 	currentfilePath=$(echo "$1"| cut -d '/' -f5-)
-	newfileNew="$(echo "$currentfilePath" | sed s:/:__:g)"
-	echo "$newfileNew"
 	# echo "$(realpath ${1} | sed s:/:__:g)"
 	analyzResult=$(/var/www/jianghu_entertain/vendor/bin/phpcs --standard="/var/www/jianghu_entertain/phpcs-rule/phpcs.xml" "$1")
 	EXIT_STATUS=$?
 #  /var/www/jianghu_entertain/vendor/bin/phpcs --standard="/var/www/jianghu_entertain/phpcs-rule/phpcs.xml" "$1"
         echo "exist status is $EXIT_STATUS"
-        if [ "$EXIT_STATUS" -eq "0" ]; then
+        if [ "$i" -gt "0" ] && [ "$EXIT_STATUS" -ne "0" ] ; then
+            i=0
+          #second time enter into same function it should be send message
+          sendFailFile "$currentfilePath"
+        elif [ "$EXIT_STATUS" -eq "0" ]; then
+            i=0
           echo "\t\033[32mPHPCS Passed: $1\033[0m result"
         else
-          echo "$analyzResult" >> /var/www/tmp/$newfileNew.log
-          log=$(git log -n 1 --pretty='format:%Hê%sê%adê%anê' -- "$currentfilePath")
-          msgCaption="$currentfilePath"
-          msgCaption+=$(echoCommitMessage $log)
+            repairFile "$1" "$currentfilePath"
+        fi
+}
+
+function repairFile() {
+    RepairResult=$(/var/www/jianghu_entertain/vendor/bin/phpcbf --standard=/var/www/jianghu_entertain/phpcs-rule/phpcs.xml "$1")
+    echo "$RepairResult"
+    ((i++))
+    analyzeFile "$1"
+}
+
+function sendFailFile() {
+    #original /e/projects/jianghu_entertain/.editorconfig
+    #to get .editorconfig
+    currentfilePath="$1"
+    git checkout "$currentfilePath"
+    newfileNew="$(echo "$currentfilePath" | sed s:/:__:g)"
+    echo "$analyzResult" >> /var/www/tmp/$newfileNew.log
+    log=$(git log -n 1 --pretty='format:%Hê%sê%adê%anê' -- "$currentfilePath")
+    msgCaption="$currentfilePath"
+    msgCaption+=$(echoCommitMessage $log)
 #          echo "$msgCaption"
-          #Send Telegram Message to Specific Group
+    #Send Telegram Message to Specific Group
 #          https://github.com/topkecleon/telegram-bot-bash
 #          https://github.com/rahiel/telegram-send
-          telegram-send --file "/var/www/tmp/$newfileNew.log" --caption "$currentfilePath"
-        fi
+    telegram-send --file "/var/www/tmp/$newfileNew.log" --caption "$currentfilePath"
 }
 
 cd $PROJ_DIR
