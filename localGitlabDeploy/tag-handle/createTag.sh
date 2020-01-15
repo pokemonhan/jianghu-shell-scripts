@@ -61,7 +61,10 @@ function echoCommitMessage()
 	set -- $1
 	# every strange character should use double place
     #normal
-    echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8 9 is $9, 10 is $10, 12 is $12"
+#    1 is 79f2bc20083169be392df58e18c2485118ea9dc2 (master), 2 is ,3 is Merge branch 'feature/taibo/update-seederCommand',4 is ,5 is Wed Jan 15 15:52:54 2020,6 is ,7 is Harris,8 is  9 is <harrisdt15f@gmail.com>,
+#now  is is 更新seeder生成器,匹配现有的git规则,4 is ,5 is Wed Jan 15 15:47:21 2020,6 is ,7 is tab,8 is  9 is <ckx9667131121@gmail.com>
+#    echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8 9 is $9, 10 is $10, 12 is $12"
+
     branchName=$(echo "$1"| cut -d ' ' -f2)
     if [[ $3 != *"Merge"* ]]; then
 #        echo here is in merge "$2";
@@ -101,7 +104,7 @@ function sendMsgToTgDetail() {
       STRING="$2"
       STRLENGTH=$(echo -n "$STRING" | wc -m)
       echo "length is $STRLENGTH"
-      for (( c=1; c<=$STRLENGTH; c+=500 ))
+      for (( c=0; c<=$STRLENGTH; c+=500 ))
       do
          msg="${STRING:$c:500}"
          echo "now  is $msg\n";
