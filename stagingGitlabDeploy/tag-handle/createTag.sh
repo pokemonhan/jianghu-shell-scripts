@@ -69,10 +69,10 @@ function echoCommitMessage()
     if [[ $3 != *"Merge"* ]]; then
 #        echo here is in merge "$2";
         ((i++))
-        echo "$i:来自分支=》$branchName"
-        echo " 信息=》$3"
-        echo " 提交者=》$7,邮箱=》$9"
-        echo " 日期=》$5"
+        echo "$i:来自分支==>>$branchName"
+        echo " 信息==>>$3"
+        echo " 提交者==>>$7,邮箱==>>$9"
+        echo " 日期==>>$5"
         # echo "HashNo is $1,Message is $2,Date is $3,Author is $4,Mail is $5"
     fi
     set +f; unset IFS
@@ -104,7 +104,8 @@ function sendMsgToTgDetail() {
       STRING="$2"
       STRLENGTH=$(echo -n "$STRING" | wc -m)
       echo "length is $STRLENGTH"
-      for (( c=0; c<=$STRLENGTH; c+=500 ))
+      # tg max character 4096
+      for (( c=0; c<=$STRLENGTH; c+=4000 ))
       do
          msg="${STRING:$c:500}"
          echo "now  is $msg\n";
