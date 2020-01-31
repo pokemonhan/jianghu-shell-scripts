@@ -306,7 +306,8 @@ do
   echo "$ref : $oldrev ~ $newrev"
   current_branch=$(echo $ref | cut -d '/' -f 3-)
   echo "current_branch name is $current_branch"
-  # shellcheck disable=SC2095
+  if [ $oldrev != '0000000000000000000000000000000000000000' ]; then
+      # shellcheck disable=SC2095
   ssh -l $destination_user $destination_host \
       -o PasswordAuthentication=no    \
       -o StrictHostKeyChecking=no     \
@@ -377,6 +378,7 @@ EOL
 		done
 	done
 	############################################
+  fi
 done
 cleanup $TMP_DIR
 exit 0
