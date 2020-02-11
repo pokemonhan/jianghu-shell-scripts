@@ -3,4 +3,5 @@ jianghu_entertain ssh://git@172.19.0.1:2289/php/jianghu_entertain.git ssh://git@
 jianghu_h5 ssh://git@172.19.0.1:2289/js-frontend/jianghu_h5.git ssh://git@gitlab.397017.com:2289/js-frontend/jianghu_h5.git
 phpcs-rule ssh://git@172.19.0.1:2289/php/phpcs-rule.git ssh://git@gitlab.397017.com:2289/php/phpcs-rule.git
 shell-scripts ssh://git@172.19.0.1:2289/php/shell-scripts.git ssh://git@gitlab.397017.com:2289/php/shell-scripts.git
+harrisdock ssh://git@gitlab.397017.com:2289/php/harrisdock.git git@github.com:laradock/laradock.git
 test ssh://git@172.19.0.1:2289/php/test.git ssh://git@gitlab.397017.com:2289/php/test.git
