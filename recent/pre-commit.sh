@@ -1,5 +1,5 @@
 #!/bin/sh
-container="d366535c68c8"
+container="a80befe136c9"
 docker=1
 projectfolder="/var/www/jianghu_entertain"
 phpcsbin="$projectfolder/vendor/bin"
@@ -7,9 +7,9 @@ phpcslocation="$phpcsbin/phpcs"
 phpstanlocation="$phpcsbin/phpstan"
 # autoloadPath="$projectfolder/vendor/autoload.php"
 # -a $autoloadPath
-RULESET="$projectfolder/phpcs.xml"
+RULESET="$projectfolder/phpcs-rule/phpcs.xml"
 #helper="$projectfolder/_ide_helper.php"
-neonfile="$projectfolder/phpstan.neon"
+neonfile="$projectfolder/phpcs-rule/phpstan.neon"
 
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
 
