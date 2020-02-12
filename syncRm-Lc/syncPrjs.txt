@@ -1,7 +1,7 @@
-#ProjectName #LocalGitlab-ssh #RemoteGitlab-ssh
-jianghu_entertain ssh://git@172.19.0.1:2289/php/jianghu_entertain.git ssh://git@gitlab.397017.com:2289/php/jianghu_entertain.git
-jianghu_h5 ssh://git@172.19.0.1:2289/js-frontend/jianghu_h5.git ssh://git@gitlab.397017.com:2289/js-frontend/jianghu_h5.git
-phpcs-rule ssh://git@172.19.0.1:2289/php/phpcs-rule.git ssh://git@gitlab.397017.com:2289/php/phpcs-rule.git
-shell-scripts ssh://git@172.19.0.1:2289/php/shell-scripts.git ssh://git@gitlab.397017.com:2289/php/shell-scripts.git
-harrisdock git@github.com:harrisdt15f/harrisdock.git git@github.com:laradock/laradock.git
-test ssh://git@172.19.0.1:2289/php/test.git ssh://git@gitlab.397017.com:2289/php/test.git
+#ProjectName #LocalGitlab-ssh #RemoteGitlab-ssh #git config user.name for first url #git config user.email for first email #git username2 #git email2 #If pushable to first url
+jianghu_entertain ssh://git@172.19.0.1:2289/php/jianghu_entertain.git ssh://git@gitlab.397017.com:2289/php/jianghu_entertain.git server server@jianghu.com server server@jianghu.com 1
+jianghu_h5 ssh://git@172.19.0.1:2289/js-frontend/jianghu_h5.git ssh://git@gitlab.397017.com:2289/js-frontend/jianghu_h5.git server server@jianghu.com server server@jianghu.com 1
+phpcs-rule ssh://git@172.19.0.1:2289/php/phpcs-rule.git ssh://git@gitlab.397017.com:2289/php/phpcs-rule.git server server@jianghu.com server server@jianghu.com 1
+shell-scripts ssh://git@172.19.0.1:2289/php/shell-scripts.git ssh://git@gitlab.397017.com:2289/php/shell-scripts.git server server@jianghu.com server server@jianghu.com 1
+harrisdock git@github.com:harrisdt15f/harrisdock.git git@github.com:laradock/laradock.git Harris harrisdt15f@gmail.com Harris harrisdt15f@gmail.com 0
+test ssh://git@172.19.0.1:2289/php/test.git ssh://git@gitlab.397017.com:2289/php/test.git server server@jianghu.com server server@jianghu.com 1

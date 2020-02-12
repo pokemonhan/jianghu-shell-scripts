@@ -8,12 +8,17 @@ input="$dir/syncPrjs.txt"
 function gitParamRetrieve()
 {
     local ProjectName=$(echo "$1"| cut -d ' ' -f1)
-	local LocalGitlab=$(echo "$1"| cut -d ' ' -f2)
-	local RMGitlab=$(echo "$1"| cut -d ' ' -f3)
+    local LocalGitlab=$(echo "$1"| cut -d ' ' -f2)
+    local RMGitlab=$(echo "$1"| cut -d ' ' -f3)
+    local GitUserName=$(echo "$1"| cut -d ' ' -f4)
+    local GitUserEmail=$(echo "$1"| cut -d ' ' -f5)
+    local GitUserName2=$(echo "$1"| cut -d ' ' -f6)
+    local GitUserEmail2=$(echo "$1"| cut -d ' ' -f7)
+    local pushable=$(echo "$1"| cut -d ' ' -f8)
 #	set -f; IFS=' '
 #	set -- $1
 #	 echo "ProjectName is $ProjectName,LocalGitlab is $LocalGitlab,RMGitlab is $RMGitlab"
-	gitSyncDirectory "$ProjectName" "$LocalGitlab" "$RMGitlab"
+	gitSyncDirectory "$ProjectName" "$LocalGitlab" "$RMGitlab" "$GitUserName" "$GitUserEmail" "$GitUserName2" "$GitUserEmail2" "$pushable"
 #	set +f; unset IFS
 }
 
@@ -23,6 +28,12 @@ function gitSyncDirectory()
 	local ProjectName="$1"
 	local LocalGitlab="$2"
 	local RMGitlab="$3"
+	local GitUserName="$4"
+  local GitUserEmail="$5"
+  local GitUserName2="$6"
+  local GitUserEmail2="$7"
+  local pushable="$8"
+
 	if [ ! -d "$syncDirectory/$ProjectName" ]
 	then
 		 mkdir -m 777 -p "$syncDirectory/$ProjectName"
@@ -32,30 +43,43 @@ function gitSyncDirectory()
 	fi
 	cd "$syncDirectory/$ProjectName"
 	chmod -R 777 "$syncDirectory/$ProjectName"
-	checkandSetUrl $ProjectName $LocalGitlab $RMGitlab
+	checkandSetUrl "$ProjectName" "$LocalGitlab" "$RMGitlab" "$GitUserName" "$GitUserEmail" "$GitUserName2" "$GitUserEmail2" "$pushable"
 }
 
 function checkandSetUrl()
 {
-	local ProjectName="$1"
-	local LocalGitlab="$2"
-	local RMGitlab="$3"
-	git config --global user.name server
+    local ProjectName="$1"
+    local LocalGitlab="$2"
+    local RMGitlab="$3"
+    local GitUserName="$4"
+    local GitUserEmail="$5"
+    local GitUserName2="$6"
+    local GitUserEmail2="$7"
+    local pushable="$8"
+
+	  git config --global user.name server
     git config --global user.email server@jianghu.com
     git config core.fileMode false
     gitRMURLDetail=$(git remote -v)
 #    echo "before is $gitRMURLDetail"
+#####Handling for Second Url [remote url] #############
 	git remote set-url origin "$RMGitlab"
+	git config user.name "$GitUserName2"
+  git config user.email "$GitUserEmail2"
 	gitRMURLDetail=$(git remote -v)
 #    echo "After is $gitRMURLDetail"
-	pushOrPullAction "$ProjectName" "$LocalGitlab"
+#####Handling for First Url [remote url] #############
+	pushOrPullAction "$ProjectName" "$LocalGitlab" "$pushable"
 	git remote set-url origin "$LocalGitlab"
+	git config user.name "$GitUserName"
+  git config user.email "$GitUserEmail"
 }
 
 function pushOrPullAction()
 {
   local ProjectName="$1"
   local LocalGitlab="$2"
+  local pushable="$3"
   #项目同步发版通知
   local tg_chat_group_id='-1001457674977';
    remoteUpdate=$(git remote -v update)
@@ -75,7 +99,7 @@ function pushOrPullAction()
 	elif [[ $LOCAL == $BASE ]]; then
 	    echo "Need to pull"
 #	    pulling=$(git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --recurse-submodules=no --progress --prune)
-        pulling=$(git pull)
+      pulling=$(git pull)
 	    echo $pulling
 #	    cd /var/www/telegram-bot-bash;
 #      export BASHBOT_HOME="$(pwd)";
@@ -95,6 +119,12 @@ function pushOrPullAction()
 	  echo $pushing
 	elif [[ $REMOTE == $BASE ]]; then
 	    echo "Need to push"
+	    if [ "$pushable" -ne "0" ]; then
+          echo "now ready to push to $LocalGitlab"
+          git remote set-url origin "$LocalGitlab"
+          pushing=$(git push)
+          echo $pushing
+      fi
 	else
 	    echo "Diverged"
 	fi
