@@ -1,5 +1,6 @@
 #!/bin/sh
-container="a80befe136c9"
+containerPHPCS="a80befe136c9"
+containerStan="cbc496ca162e"
 docker=1
 projectfolder="/var/www/jianghu_entertain"
 phpcsbin="$projectfolder/vendor/bin"
@@ -22,7 +23,7 @@ PASS=true
 echo "\nValidating PHPCS:\n"
 
 # Check for phpcs
-result=$(docker exec -i ${container} which ${phpcslocation})
+result=$(docker exec -i ${containerPHPCS} which ${phpcslocation})
 echo $result
 $result &> /dev/null
 if [[ "$?" == 1 ]]; then
@@ -36,9 +37,10 @@ do
   dir=$(pwd)
   echo $dir
   tail=$(echo $dir | cut -d'/' -f5-)
-  filelocation=$projectfolder/$tail/$FILE
+  # filelocation=$projectfolder/$tail/$FILE
+  filelocation=$projectfolder/$FILE
   echo "Here is filelocation $filelocation and here is  phpcslocation $phpcslocation"
-  docker exec ${container} bash -c "cd $phpcsbin;\
+  docker exec ${containerPHPCS} bash -c "cd $phpcsbin;\
 ./phpcs --standard=$RULESET $filelocation"
   EXIT_STATUS=$?
   echo "exist status is $EXIT_STATUS"
@@ -46,7 +48,7 @@ do
   echo "Starting To Run Code Quality"
   #docker exec ${container} bash -c "cd $phpcsbin;\
 #./phpstan analyze --level=max --error-format=table -a $autoloadPath $filelocation"
-docker exec ${container} bash -c "cd $projectfolder;\
+docker exec ${containerStan} bash -c "cd $projectfolder;\
 php artisan code:analyse --error-format=table --memory-limit=1G -c $neonfile --paths=$filelocation"
     STAN_STATUS=$?
   echo "STAN status is $STAN_STATUS"
