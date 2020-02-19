@@ -178,12 +178,13 @@ function validatePhpcs() {
   local TMP_DIR="$6"
   if [ -f "$changed_file" ]; then
     ################# [ phpcs checking ]######################
+  ###phpcs should check under without swoole loader because depreacated rule not compatibality with it####
         RULESET="$projDir/phpcs-rule/phpcs.xml"
         ssh -l "$destination_user" "$destination_host" \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
         -o UserKnownHostsFile=/dev/null \
-        -p 2225                         \
+        -p 2226                         \
         -i /var/www/harrisdock/workspace/insecure_id_rsa    \
        "cd $projDir/vendor/bin;\
 ./phpcs --standard=$RULESET $changed_file"
