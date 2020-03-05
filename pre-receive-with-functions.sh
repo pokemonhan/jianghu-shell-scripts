@@ -216,7 +216,7 @@ function validatePHPStan() {
     -p 2225                         \
     -i /var/www/harrisdock/workspace/insecure_id_rsa    \
    "cd $projDir;\
-   php artisan code:analyse --error-format=table --memory-limit=1G -a $autoloadPath -c $neonfile --paths=$changed_file;"
+   $projDir/vendor/bin/phpstan analyse -c $neonfile -a $autoloadPath $changed_file --error-format=table --memory-limit=1G;"
    STAN_STATUS=$?
     echo "STAN status is $STAN_STATUS"
       if [ "$STAN_STATUS" -eq "0" ]; then

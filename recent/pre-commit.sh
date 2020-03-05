@@ -1,12 +1,12 @@
 #!/bin/sh
-containerPHPCS="a80befe136c9"
-containerStan="cbc496ca162e"
+containerPHPCS="c02864633e9a"
+containerStan="d65dd0ed3ede"
 docker=1
 projectfolder="/var/www/jianghu_entertain"
 phpcsbin="$projectfolder/vendor/bin"
 phpcslocation="$phpcsbin/phpcs"
 phpstanlocation="$phpcsbin/phpstan"
-# autoloadPath="$projectfolder/vendor/autoload.php"
+autoloadPath="$projectfolder/vendor/autoload.php"
 # -a $autoloadPath
 RULESET="$projectfolder/phpcs-rule/phpcs.xml"
 #helper="$projectfolder/_ide_helper.php"
@@ -49,7 +49,7 @@ do
   #docker exec ${container} bash -c "cd $phpcsbin;\
 #./phpstan analyze --level=max --error-format=table -a $autoloadPath $filelocation"
 docker exec ${containerStan} bash -c "cd $projectfolder;\
-php artisan code:analyse --error-format=table --memory-limit=1G -c $neonfile --paths=$filelocation"
+$projectfolder/vendor/bin/phpstan analyse -c $neonfile -a $autoloadPath $filelocation --error-format=table --memory-limit=1G;"
     STAN_STATUS=$?
   echo "STAN status is $STAN_STATUS"
     if [ "$STAN_STATUS" -eq "0" ]; then
