@@ -129,4 +129,5 @@ source ./bashbot.sh source;
 startEmoji="🤩";
 telegrammsg="$startEmoji [ 已发布版本:$vno ]$startEmoji\n\n[ 发布摘要 ]:\n$message";
 sendMsgToTgDetail "$tg_chat_group_id" "$telegrammsg"
+scp -i /var/www/harrisdock/workspace/crontab/v7.3/jianghu-malaysia.pem -r /var/www/jianghu_entertain/storage/statics root@47.254.235.19:/var/www/jianghu_entertain/storage
 #send_message "$tg_chat_group_id" "$telegrammsg";
