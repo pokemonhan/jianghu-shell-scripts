@@ -176,6 +176,7 @@ function validatePhpcs() {
   local changed_file="$4"
   local filename="$5"
   local TMP_DIR="$6"
+  currentScriptDir="shell-scripts"
   if [ -f "$changed_file" ]; then
     ################# [ phpcs checking ]######################
   ###phpcs should check under without swoole loader because depreacated rule not compatibality with it####
@@ -186,9 +187,9 @@ function validatePhpcs() {
         -o UserKnownHostsFile=/dev/null \
         -p 2226                         \
         -i /var/www/harrisdock/workspace/insecure_id_rsa    \
-       "cd $projDir/vendor/bin;\
-./phpcs --standard=$RULESET $changed_file"
+       "bash /var/www/$currentScriptDir/hookexec/phpcs.sh $projDir $RULESET $changed_file;"
         EXIT_STATUS=$?
+        error " \t\033[41mPHPCS Failed: $filename\033[0m"
         echo "exist status is $EXIT_STATUS"
         if [ "$EXIT_STATUS" -eq "0" ]; then
           echo "\t\033[32mPHPCS Passed: $filename\033[0m result"
