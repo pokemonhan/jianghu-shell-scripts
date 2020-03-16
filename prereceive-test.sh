@@ -27,7 +27,7 @@ TMPTOOLS=/tmp/check_tools
 
 errorStatus=0
 destination_user="root"
-destination_host="172.19.0.1"
+destination_host=`ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3`
 projDir='test'
 
 #echo "RUN pre-receive hook (https://github.com/ezweb/pre-receive-hook)"

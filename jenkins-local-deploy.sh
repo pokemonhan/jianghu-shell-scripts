@@ -25,7 +25,7 @@ echo "Email address $BUILD_USER_EMAIL";
 
 shareprj='/var/www/shareprj';
 tailPath='site/jianghu_entertain';
-destination_host='172.19.0.1';
+destination_host=`ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3`
 destination_user='root';
 #get current script directory dynamically
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -66,7 +66,7 @@ case $Type  in
                   -p 2225                         \
                   -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                  "cd $destination_dir;\
-                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
+                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_host; \
                  /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;\
                   php artisan clear-compiled;\
                   php artisan cache:clear;\
@@ -97,7 +97,7 @@ case $Type  in
                   -p 2225                         \
                   -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                  "cd $destination_dir;\
-                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
+                 bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_host; \
                  /usr/local/bin/composer update --no-interaction --no-progress --no-ansi;\
                   php artisan clear-compiled;\
                   php artisan config:cache;\
@@ -125,7 +125,7 @@ case $Type  in
                         -p 2225                         \
                         -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                        "cd $destination_dir;\
-                       bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
+                       bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_host; \
                         php artisan clear-compiled;\
                         php artisan cache:clear;\
                         php artisan route:cache;\
@@ -143,7 +143,7 @@ case $Type  in
 "
   ;;
 
-#ssh -l root 172.19.0.1 \
+#ssh -l root 172.22.0.1 \
 #                   -o PasswordAuthentication=no    \
 #                   -o StrictHostKeyChecking=no     \
 #                   -o UserKnownHostsFile=/dev/null \
@@ -172,7 +172,7 @@ case $Type  in
                       -p 2225                         \
                       -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                      "cd $destination_dir;\
-                     bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
+                     bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_host; \
                      /usr/local/bin/composer dump-autoload;\
                      chmod -R 777 ${destination_dir}/storage;\
                      chmod -R 777 ${destination_dir}/vendor;\
@@ -206,7 +206,7 @@ fi
                           -p 2225                         \
                           -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
-                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
+                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_host; \
                          $ActionCommand;\
                          /usr/local/bin/composer dump-autoload;\
                          chmod -R 777 ${destination_dir}/storage;\
@@ -233,7 +233,7 @@ fi
                           -p 2225                         \
                           -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
                          "cd $destination_dir;\
-                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir; \
+                         bash /var/www/$currentScriptDir/localDeploy/git/git-submodule-composer-update.sh $destination_dir $destination_host; \
                          $ArtisanCommand;\
                          chmod -R 777 ${destination_dir}/storage;\
                          chmod -R 777 ${destination_dir}/vendor;\

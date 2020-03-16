@@ -1,6 +1,6 @@
 #!/bin/sh
 destination_dir="$1"
-destination_host="172.19.0.1"
+destination_host="$2"
 #/var/www/jianghu_entertain
 cd "$destination_dir"
 rm -rf ${destination_dir}/jianghu_entertain_composer;

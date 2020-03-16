@@ -3,7 +3,8 @@
 ls -la
 destination_dir="/var/www/jianghu_entertain"
 destination_user="root"
-destination_host="172.19.0.1"
+#gateway of container
+destination_host=`ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3`
 #PHPCS_CODING_STANDARD="PEAR"
 # use coding standart dir from local repo
 #PHPCS_DIR_LOCAL=0

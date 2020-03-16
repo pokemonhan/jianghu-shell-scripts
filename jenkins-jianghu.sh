@@ -43,9 +43,10 @@ sanity_check() {
 echo
 ##################################################################################
 destination_user="$dest_user_staging"
-destination_host="$dest_host_staging" #$dest_host_staging　
+#172.22.0.1　9170ttt.com
+destination_host=`ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3`
+#destination_host="$dest_host_staging" #$dest_host_staging　
 destination_dir="$dest_dir_staging"
-gitlabip="172.19.0.1" # 172.22.0.1　9170ttt.com
 ##################################################################################
 case $Status  in
   Deploy)
