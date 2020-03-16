@@ -28,6 +28,9 @@ EOL
         if [[ ! -e ${destination_dir}/jianghu_entertain_composer ]]; then
             git submodule add -f ssh://git@${destination_host}:2289/php/jianghu_entertain_composer.git jianghu_entertain_composer;
         fi;
+        if [[ ! -e ${destination_dir}/app/Game ]]; then
+            git submodule add -f ssh://git@${destination_host}:2289/php/jianghu_game_modules.git app/Game;
+        fi;
         git submodule init;
         git submodule sync;
         chmod 777 ${destination_dir}/phpcs-rule;
@@ -37,6 +40,11 @@ EOL
         git pull origin master;
         chmod 777 ${destination_dir}/jianghu_entertain_composer;
         cd ${destination_dir}/jianghu_entertain_composer;
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;
+        git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;
+        git pull origin master;
+        chmod 777 ${destination_dir}/app/Game;
+        cd ${destination_dir}/app/Game;
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false fetch origin --progress --prune;
         git pull origin master;
