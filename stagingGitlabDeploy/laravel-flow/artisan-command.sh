@@ -46,6 +46,7 @@ cp -f jianghu_entertain_composer/composer.json composer.json
 php artisan clear-compiled;
 case $isSeed in
   1|2)
+   php artisan modelCache:clear;
    php artisan migrate:fresh --seed;
   ;;
 esac

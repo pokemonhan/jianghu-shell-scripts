@@ -47,6 +47,7 @@ php artisan clear-compiled;
 php artisan lang:publish zh-CN --force;
 case $isSeed in
   1|2)
+   php artisan modelCache:clear;
    php artisan migrate:fresh --seed;
   ;;
 esac
