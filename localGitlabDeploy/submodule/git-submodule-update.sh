@@ -34,7 +34,6 @@ EOL
             git submodule add -f ssh://git@${destination_host}:2289/php/jianghu_game_modules.git app/Game;
         fi;
         git submodule update --init --recursive
-        git clean -d -f -f -x
         git submodule foreach --recursive git clean -d -f -f -x
         chmod 777 ${destination_dir}/phpcs-rule;
         cd ${destination_dir}/phpcs-rule;
