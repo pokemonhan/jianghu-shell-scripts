@@ -17,6 +17,9 @@ git pull origin $destination_branch;
 [submodule "jianghu_entertain_composer"]
 	path = jianghu_entertain_composer
 	url = ssh://git@${destination_host}:2289/php/jianghu_entertain_composer.git
+[submodule "app/Game"]
+	path = app/Game
+	url = ssh://git@${destination_host}:2289/php/jianghu_game_modules.git
 EOL
         chmod 777 ${destination_dir}/.gitmodules;
         if [[ ! -e ${destination_dir}/phpcs-rule ]]; then
