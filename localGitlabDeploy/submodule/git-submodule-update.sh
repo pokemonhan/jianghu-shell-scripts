@@ -9,6 +9,8 @@ git fetch --all;
 git checkout -f $destination_branch;
 git reset --hard;
 git fetch --all;
+git submodule foreach --recursive 'git reset HEAD . || :'
+git submodule foreach --recursive 'git checkout -- . || :'
 git pull origin $destination_branch;
               cat > ${destination_dir}/.gitmodules <<EOL
 [submodule "phpcs-rule"]
@@ -31,8 +33,9 @@ EOL
         if [[ ! -e ${destination_dir}/app/Game ]]; then
             git submodule add -f ssh://git@${destination_host}:2289/php/jianghu_game_modules.git app/Game;
         fi;
-        git submodule init;
-        git submodule sync;
+        git submodule update --init --recursive
+        git clean -d -f -f -x
+        git submodule foreach --recursive git clean -d -f -f -x
         chmod 777 ${destination_dir}/phpcs-rule;
         cd ${destination_dir}/phpcs-rule;
         git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --;
