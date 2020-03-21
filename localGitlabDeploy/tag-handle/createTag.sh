@@ -2,6 +2,7 @@
 destination_dir="$1"
 tg_chat_group_id="$2"
 previousTag="$3"
+notag="$4"
 cd "$destination_dir"
 
 #Increment Function to string with pre zero and integer
@@ -58,16 +59,16 @@ function echoCommitMessage()
     # 01f6db6f894f18f89fc19b91747783ffd0bb6f8a (feature/taibo/h5-recharge-order-offline),:sparkles: write bb,Tue Jan 7 12:38:56 2020,Harris,<harrisdt15f@gmail.com>
     # 356ab5f64176e7b9aa5cd99d0f7c148ca12a975f (feature/taibo/h5-recharge-order-offline~1),:sparkles: write aa,Tue Jan 7 12:38:39 2020,Harris,<harrisdt15f@gmail.com>
     set -f; IFS='ê'
-	set -- $1
-	# every strange character should use double place
+	  set -- $1
+	  # every strange character should use double place
     #normal
-#    1 is 79f2bc20083169be392df58e18c2485118ea9dc2 (master), 2 is ,3 is Merge branch 'feature/taibo/update-seederCommand',4 is ,5 is Wed Jan 15 15:52:54 2020,6 is ,7 is Harris,8 is  9 is <harrisdt15f@gmail.com>,
-#now  is is 更新seeder生成器,匹配现有的git规则,4 is ,5 is Wed Jan 15 15:47:21 2020,6 is ,7 is tab,8 is  9 is <ckx9667131121@gmail.com>
-#    echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8 9 is $9, 10 is $10, 12 is $12"
+    #    1 is 79f2bc20083169be392df58e18c2485118ea9dc2 (master), 2 is ,3 is Merge branch 'feature/taibo/update-seederCommand',4 is ,5 is Wed Jan 15 15:52:54 2020,6 is ,7 is Harris,8 is  9 is <harrisdt15f@gmail.com>,
+    #now  is is 更新seeder生成器,匹配现有的git规则,4 is ,5 is Wed Jan 15 15:47:21 2020,6 is ,7 is tab,8 is  9 is <ckx9667131121@gmail.com>
+    #    echo "1 is $1, 2 is $2,3 is $3,4 is $4,5 is $5,6 is $6,7 is $7,8 is $8 9 is $9, 10 is $10, 12 is $12"
 
     branchName=$(echo "$1"| cut -d ' ' -f2)
     if [[ $3 != *"Merge"* ]]; then
-#        echo here is in merge "$2";
+    #echo here is in merge "$2";
         ((i++))
         echo "$i:来自分支==>>$branchName"
         echo " 信息==>>$3"
@@ -115,19 +116,24 @@ function sendMsgToTgDetail() {
 
 message="$(createCommitMessage $previousTag)"
 echo tag message now is ${message};
+echo "notag status is $notag";
+startEmoji="🤩";
 #################【 createing Verson Number 】########################
-#previousTag='V-JH-20200301001-253'
-vno=$(createVersionNumber $previousTag)
-######################################################################
-git tag -l "$vno";
-git tag -a "$vno" -f -m "${message}";
-git push --follow-tags;
+if [ "$notag" -ne "1" ]; then
+  #previousTag='V-JH-20200301001-253'
+  vno=$(createVersionNumber $previousTag)
+  git tag -l "$vno";
+  git tag -a "$vno" -f -m "${message}";
+  git push --follow-tags;
+  telegrammsg="$startEmoji [ 已发布版本:$vno ]$startEmoji\n\n[ 发布摘要 ]:\n$message";
+else
+  telegrammsg="$startEmoji [ 预发布环境已同步发布以下功能 ]$startEmoji\n\n[ 发布摘要 ]:\n$message";
+fi
+
 #Send Telegram Message to Specific Group
 cd /var/www/telegram-bot-bash;
 export BASHBOT_HOME="$(pwd)";
 source ./bashbot.sh source;
-startEmoji="🤩";
-telegrammsg="$startEmoji [ 已发布版本:$vno ]$startEmoji\n\n[ 发布摘要 ]:\n$message";
 sendMsgToTgDetail "$tg_chat_group_id" "$telegrammsg"
 scp -i /var/www/harrisdock/workspace/crontab/v7.3/jianghu-malaysia.pem -r /var/www/jianghu_entertain/storage/statics root@47.254.235.19:/var/www/jianghu_entertain/storage
 #send_message "$tg_chat_group_id" "$telegrammsg";
