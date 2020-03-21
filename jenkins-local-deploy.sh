@@ -32,24 +32,13 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo $dir;
 currentScriptDir="${dir##*/}";
 case $BUILD_USER_FIRST_NAME in
-   "Harris")
-   dirUser="harris";
-   destination_dir="$shareprj/$dirUser/$tailPath"
-      ;;
-    "Alvin")
-    dirUser='alvinphp';
-   destination_dir="$shareprj/$dirUser/$tailPath"
-      ;;
-    "taibo")
-   dirUser='taibophp';
-   destination_dir="$shareprj/$dirUser/$tailPath"
-      ;;
-    "ethan")
-   dirUser='ethan';
-   destination_dir="$shareprj/$dirUser/$tailPath"
-      ;;
+#   "Harris")
+#   dirUser="harris";
+#   destination_dir="$shareprj/$dirUser/$tailPath"
+#      ;;
    *)
-     echo "FFFFFFFFFF";
+     dirUser="${BUILD_USER_FIRST_NAME}php";
+     destination_dir="$shareprj/$dirUser/$tailPath"
      ;;
 esac
 case $Type  in
