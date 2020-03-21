@@ -28,6 +28,10 @@ errorStatus=0
 destination_user="root"
 destination_host=`ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3`
 projDir='jianghu_entertain'
+#get current script directory dynamically
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo $dir;
+currentScriptDir="${dir##*/}";
 
 #echo "RUN pre-receive hook (https://github.com/ezweb/pre-receive-hook)"
 
@@ -124,10 +128,6 @@ function validate_php()
   local destination_user="$4"
   local destination_host="$5"
   echo "currentfile is $changed_file and currentDir is $projDir and tmpdir is $TMP_DIR"
-  #get current script directory dynamically
-  dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-  echo $dir;
-  currentScriptDir="${dir##*/}";
   php=$(ssh -l $destination_user $destination_host \
         -o PasswordAuthentication=no    \
         -o StrictHostKeyChecking=no     \
@@ -142,8 +142,8 @@ function validate_php()
 #        projDir=$(echo $changed_file | cut -d '/' -f 1-6)
         if [ -d "$projDir" ]; then
         ################# [ phpcs checking & larastan checking]######################
-        validatePhpcs "$destination_user" "$destination_host" "$projDir" "$changed_file" "$filename" "$TMP_DIR" "$currentScriptDir" &
-        validatePHPStan "$destination_user" "$destination_host" "$projDir" "$changed_file" "$TMP_DIR" "$currentScriptDir"
+        validatePhpcs "$destination_user" "$destination_host" "$projDir" "$changed_file" "$filename" "$TMP_DIR" &
+        validatePHPStan "$destination_user" "$destination_host" "$projDir" "$changed_file" "$TMP_DIR"
         ########################################################
         else
           echo "dir was clear due to error"
@@ -180,7 +180,6 @@ function validatePhpcs() {
   local changed_file="$4"
   local filename="$5"
   local TMP_DIR="$6"
-  local currentScriptDir="$7"
   if [ -f "$changed_file" ]; then
     ################# [ phpcs checking ]######################
   ###phpcs should check under without swoole loader because depreacated rule not compatibality with it####
@@ -209,7 +208,6 @@ function validatePHPStan() {
   local projDir="$3"
   local changed_file="$4"
   local TMP_DIR="$5"
-  local currentScriptDir="$6"
   if [ -f "$changed_file" ]; then
     ################# [ php-stan checking ]######################
     autoloadPath="$projDir/vendor/autoload.php"
