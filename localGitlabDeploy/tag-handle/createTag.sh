@@ -103,14 +103,18 @@ function createCommitMessage()
 function sendMsgToTgDetail() {
       tg_chat_group_id="$1"
       STRING="$2"
-      STRLENGTH=$(echo -n "$STRING" | wc -m)
+      # STRLENGTH=$(echo -n "$STRING" | wc -m)
+      size=${#STRING}
+      echo "size is $size"
+      n=3
+      incresement=500
       echo "length is $STRLENGTH"
       # tg max character 4096
-      for (( c=0; c<=$STRLENGTH; c+=4000 ))
+      for (( c=0; c<=$size; c+=$incresement ))
       do
-         msg="${STRING:$c:500}"
-         echo "now  is $msg\n";
-         send_message "$tg_chat_group_id" "$msg";
+         msg="${STRING:$c:$incresement}"
+         echo "now  is $msg";
+          send_message "$tg_chat_group_id" "$msg";
       done
 }
 
