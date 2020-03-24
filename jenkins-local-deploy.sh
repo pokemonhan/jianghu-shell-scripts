@@ -237,19 +237,24 @@ fi
 "
   ;;
   "Delete")
-      echo "Type is :$Type"
+     echo "Type is :$Type"
 #    echo "Action Name is : $ActionName";
 #    echo "Request Name is : $RequestName";
 #    echo "Artisan Command is : $ArtisanCommand";
-    ssh -l $destination_user $destination_host \
-                          -o PasswordAuthentication=no    \
-                          -o StrictHostKeyChecking=no     \
-                          -o UserKnownHostsFile=/dev/null \
-                          -p 2225                         \
-                          -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
-                         "cd $destination_dir;\
-                          rm -rf $destination_dir/$FilePath;\
-    "
+      if [ -z "$FilePath" ]
+      then
+            echo "请填写要删除的路径如果要删除整个目录中的内容请填写* 或 *.*"
+      else
+            ssh -l $destination_user $destination_host \
+                                -o PasswordAuthentication=no    \
+                                -o StrictHostKeyChecking=no     \
+                                -o UserKnownHostsFile=/dev/null \
+                                -p 2225                         \
+                                -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
+                               "cd $destination_dir;\
+                                rm -rf $destination_dir/$FilePath;\
+          "
+      fi
   ;;
   *)
   exit
