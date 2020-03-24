@@ -123,7 +123,7 @@ echo tag message now is ${message};
 echo "notag status is $notag";
 startEmoji="🤩";
 #################【 createing Verson Number 】########################
-if [ "$notag" -ne "1" ] || [ -z "$notag" ]; then
+if [ "$notag" -ne 1 ] || [ -z "$notag" ]; then
   #previousTag='V-JH-20200301001-253'
   vno=$(createVersionNumber $previousTag)
   git tag -l "$vno";
