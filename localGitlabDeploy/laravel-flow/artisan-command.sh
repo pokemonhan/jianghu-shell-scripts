@@ -44,7 +44,7 @@ rm -rf composer.lock;
 cp -f jianghu_entertain_composer/composer.json composer.json
 ###########################update composer every 6hour #############################################################
 updatelocation='/var/www/tmp/composer-daily.log'
-if [ ! -f $updatelocation ];
+if [ ! -f $updatelocation ]; then
     mkdir -m 777 -p "$(dirname "$updatelocation")" || exit
     touch "$updatelocation"
     echo "composer update first time trigger"
