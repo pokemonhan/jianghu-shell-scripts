@@ -42,7 +42,26 @@ checkIfMigration
 echo "isSeed is now $isSeed"
 rm -rf composer.lock;
 cp -f jianghu_entertain_composer/composer.json composer.json
-/usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;
+###########################update composer every 6hour #############################################################
+updatelocation='/var/www/tmp/composer-daily.log'
+if [ ! -f $updatelocation ];
+    mkdir -m 777 -p "$(dirname "$updatelocation")" || exit
+    touch "$updatelocation"
+    echo "composer update first time trigger"
+    /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;
+else
+    if [[ $(find "$updatelocation" -mmin +360 -print) ]]; then
+        echo "File $updatelocation exists and is older than 6 hours"
+        rm -f $updatelocation
+        mkdir -m 777 -p "$(dirname "$updatelocation")" || exit
+        touch "$updatelocation"
+        echo "composer has not been update for 6 hours lets update ..."
+        /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;
+    else
+      echo "composer update will do later 6 hours after"
+    fi
+fi
+####################################################################################################################
 php artisan clear-compiled;
 php artisan lang:publish zh-CN --force;
 case $isSeed in
