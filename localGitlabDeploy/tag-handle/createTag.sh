@@ -139,5 +139,5 @@ cd /var/www/telegram-bot-bash;
 export BASHBOT_HOME="$(pwd)";
 source ./bashbot.sh source;
 sendMsgToTgDetail "$tg_chat_group_id" "$telegrammsg"
-scp -i /var/www/harrisdock/workspace/crontab/v7.3/jianghu-malaysia.pem -r /var/www/jianghu_entertain/storage/statics root@47.254.235.19:/var/www/jianghu_entertain/storage
+#scp -i /var/www/harrisdock/workspace/crontab/v7.3/jianghu-malaysia.pem -r /var/www/jianghu_entertain/storage/statics root@47.254.235.19:/var/www/jianghu_entertain/storage
 #send_message "$tg_chat_group_id" "$telegrammsg";
