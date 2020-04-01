@@ -91,7 +91,22 @@ function analyzeFile()
           sendFailFile "$currentfilePath"
         elif [ "$EXIT_STATUS" -eq "0" ]; then
             i=0
-          echo "\t\033[32mPHPCS Passed: $1\033[0m result"
+            #######################[execute PHPSTAN ]###########################
+            projectfolder='/var/www/jianghu_entertain'
+            neonfile="$projectfolder/phpcs-rule/phpstan.neon"
+            autoloadPath="$projectfolder/vendor/autoload.php"
+            # echo "$(realpath ${1} | sed s:/:__:g)"
+            analyzResult=$("$projectfolder"/vendor/bin/phpstan analyse -c "$neonfile" -a "$autoloadPath" "$1" --error-format=table --memory-limit=1G)
+            STAN_STATUS=$?
+            echo "STAN status is $STAN_STATUS"
+              if [ "$STAN_STATUS" -eq "0" ]; then
+                echo "\t\033[32mPHPCS and PHPSTAN Passed: $1\033[0m result"
+              else
+                echo "$STAN_STATUS"
+                echo "Code Quality Test Failed"
+                sendFailFile "$currentfilePath"
+              fi
+            ##################################################################
         else
             repairFile "$1" "$currentfilePath"
         fi
