@@ -59,6 +59,7 @@ else
         /usr/local/bin/composer install --no-interaction --no-progress --no-ansi --prefer-dist --optimize-autoloader;
     else
       echo "composer update will do later 6 hours after"
+      /usr/local/bin/composer dump-autoload;
     fi
 fi
 ####################################################################################################################
