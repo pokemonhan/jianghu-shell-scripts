@@ -32,7 +32,8 @@ moduleDir='app/Game'
 #get current script directory dynamically
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo $dir;
-currentScriptDir="${dir##*/}";
+#currentScriptDir="${dir##*/}";
+currentScriptDir="shell-scripts";
 
 #echo "RUN pre-receive hook (https://github.com/ezweb/pre-receive-hook)"
 
