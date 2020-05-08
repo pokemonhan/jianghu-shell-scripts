@@ -318,7 +318,7 @@ do
       -o UserKnownHostsFile=/dev/null \
       -p 2225                         \
       -i /var/www/harrisdock/workspace/insecure_id_rsa    \
-     "bash /var/www/$currentScriptDir/localGitlabDeploy/submodule/git-submodule-update.sh $currentDir $current_branch $destination_host;"
+     "bash /var/www/$currentScriptDir/hookexec/submoduleupd.sh $currentDir $current_branch $destination_host;"
   ###########################################################
 	# in a sub-shell ...
 	invalids=0
