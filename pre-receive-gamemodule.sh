@@ -27,6 +27,7 @@ TMPTOOLS=/tmp/check_tools
 errorStatus=0
 destination_user="root"
 destination_host=`ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3`
+echo "destination_host is $destination_host"
 projDir='jianghu_entertain'
 moduleDir='app/Game'
 #get current script directory dynamically
