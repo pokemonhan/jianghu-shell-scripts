@@ -246,7 +246,6 @@ function writefile() {
   local filename="$2"
   local currentmodDir="$3"
   local currentfile="$currentmodDir/$filename"
-  cd $currentmodDir;
     #		    echo file name is $filename;
 		    mkdir -m 777 -p $(dirname "$currentfile")
 		    newFile=$(git show $newrev:$filename)
@@ -286,7 +285,7 @@ function fileAnalysis() {
             if [ "$extension" = "php" ]
             then
 #               echo vd file name is $filename;
-		           local currentfile=$currentDir/$currentmodDir/$filename
+		           local currentfile=$currentmodDir/$filename
 #		           echo "vd current file is $currentfile"
 		           echo "ready to validate php"
                 validate_php "$currentfile" "$currentDir" "$TMP_DIR" "$destination_user" "$destination_host"
@@ -321,6 +320,7 @@ do
       -p 2225                         \
       -i /var/www/harrisdock/workspace/insecure_id_rsa    \
      "bash /var/www/$currentScriptDir/hookexec/submoduleupd.sh $currentDir $current_branch $destination_host;"
+     echo "done update requirements";
   ###########################################################
 	# in a sub-shell ...
 	invalids=0
@@ -331,11 +331,13 @@ do
     then
         oldrev="$newrev^"
     fi
+	echo "starting check rev-list";
 	for commit in $( git rev-list ${oldrev}..${newrev} )
 	do
 	  for filename in $( git diff --name-only $commit^..$commit )
 		do
 		  ##############[parallel writing files ]#############
+		  echo "strating to writefile function";
 		  writefile "$newrev" "$filename" "$currentmodDir" &
 		  ####################################################
 		done
