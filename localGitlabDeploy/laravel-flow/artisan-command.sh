@@ -74,5 +74,6 @@ esac
 php artisan cache:clear;
 php artisan route:cache;
 php artisan config:cache;
-php artisan queue:restart
+php artisan generate:json;
+#php artisan queue:restart
 chmod -R 777 ${destination_dir}/storage;
