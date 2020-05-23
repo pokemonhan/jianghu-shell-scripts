@@ -1,15 +1,16 @@
 #!/bin/sh
 
 #check command input
-if [ "$#" -ne 2 ];
-then
-        echo "JENKINS LARAVEL PUSH"
-        echo "--------------------"
-        echo ""
-        echo "Usage : ./jenkins-laravel.sh project-name"
-        echo ""
-        exit 1
-fi
+#if [ "$#" -ne 2 ];
+#then
+#        echo "JENKINS LARAVEL PUSH"
+#        echo "--------------------"
+#        echo ""
+#        echo "Usage : ./jenkins-laravel.sh project-name"
+#        echo ""
+#        exit 1
+#fi
+
 # Declare variables
 currentdate=`date "+%Y-%m-%d"`
 scriptpath="/var/jenkins_workspace/$1"
