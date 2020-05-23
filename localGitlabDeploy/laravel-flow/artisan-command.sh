@@ -1,5 +1,6 @@
 #!/bin/sh
 destination_dir="$1"
+noseeder="$2"
 function execFile()
 {
 	echo "current file is $1"
@@ -68,7 +69,11 @@ php artisan lang:publish zh-CN --force;
 case $isSeed in
   1|2)
    php artisan modelCache:clear;
-   php artisan migrate:fresh --seed;
+     if [ -z "$noseeder" ] || [ "$noseeder" -ne 1 ]; then
+          php artisan migrate:fresh --seed;
+     else
+          echo 'migrate should done manually';
+      fi
   ;;
 esac
 php artisan cache:clear;

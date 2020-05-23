@@ -15,7 +15,8 @@ currentdate=`date "+%Y-%m-%d"`
 scriptpath="/var/jenkins_workspace/$1"
 destination_project="$1"
 destination_branch=`echo "$2" | awk -F "/" '{printf "%s", $2}'`
-notag="$3"
+noseeder="$3"
+notag="$4"
 version_prefix='jianghu';
 tg_chat_group_id='-356102284';
 #get current script directory dynamically
@@ -94,7 +95,7 @@ case $Status  in
         previousTag=\"\$(git describe --abbrev=0)\";\
         echo \"current Tag is \$previousTag\";\
         bash /var/www/$currentScriptDir/localGitlabDeploy/submodule/git-submodule-update.sh $destination_dir $destination_branch $destination_host; \
-        bash /var/www/$currentScriptDir/localGitlabDeploy/laravel-flow/artisan-command.sh $destination_dir; \
+        bash /var/www/$currentScriptDir/localGitlabDeploy/laravel-flow/artisan-command.sh $destination_dir $noseeder; \
         bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/createTag.sh $destination_dir $tg_chat_group_id \$previousTag $notag; \
         bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/deletetag.sh $destination_dir; \
 else\
