@@ -24,8 +24,8 @@ echo $dir;
 currentScriptDir="${dir##*/}";
 #currentScriptDir="${PWD##*/}";
 # Get configuration variables
-echo "Config files is ${scriptpath}/${destination_project}.conf"
-source ${scriptpath}/${destination_project}.conf
+#######echo "Config files is ${scriptpath}/${destination_project}.conf"
+#######source ${scriptpath}/${destination_project}.conf
 echo "Pushing to $destination_branch .. "
 
 # Declare functions
@@ -43,10 +43,12 @@ sanity_check() {
 }
 echo
 ##################################################################################
-destination_user="$dest_user_staging"
+#destination_user="$dest_user_staging"
+destination_user="root"
 #destination_host="172.22.0.1" #$dest_host_staging　
 destination_host=`ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3`
-destination_dir="$dest_dir_staging"
+#destination_dir="$dest_dir_staging"
+destination_dir="/var/www/$destination_project"
 ##################################################################################
 case $Status  in
   Deploy)
@@ -99,24 +101,6 @@ else\
     echo \"Nothing to do\";
 fi;\
               "
-              #chmod -R 775 ${destination_dir};\
-              #php artisan config:cache;"
-              #php artisan migrate --force;\
-              #php artisan queue:restart;\
-              #npm i;\
-              #npm run dev;\
-              #php artisan config:clear;\
-              #/usr/bin/php ./vendor/bin/phpunit --log-junit ${destination_dir}/tests/results/${destination_project}_test1.xml"
-
-          # Get test results
-      #    ssh -l $destination_user $destination_host \
-      #        -o PasswordAuthentication=no    \
-      #        -o StrictHostKeyChecking=no     \
-      #        -o UserKnownHostsFile=/dev/null \
-      #        -p 2225                         \
-      #        -i /var/jenkins_workspace/harrisdock/workspace/insecure_id_rsa    \
-      #        "cat ${destination_dir}/tests/results/${destination_project}_test1.xml" > ${item_rootdir}/tests/results/${destination_project}_test1.xml
-
       echo "Completing Build!"
       ###################
       # PRODUCTION PUSH # production
