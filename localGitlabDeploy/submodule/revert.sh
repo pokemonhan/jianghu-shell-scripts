@@ -30,7 +30,7 @@ then
       git commit -m "版本回滚到 $version $reSetedMsg ";
       git push origin master;
       bash /var/www/$currentScriptDir/localGitlabDeploy/laravel-flow/artisan-command.sh $destination_dir;
-      bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/createTag.sh $destination_dir $tg_chat_group_id;
+      bash /var/www/$currentScriptDir/localGitlabDeploy/tag-handle/createTag.sh $destination_dir $tg_chat_group_id $version;
 else
     echo "Tag not found" !!!!!!!!!!!!!!!!!!!!!!
 fi;
