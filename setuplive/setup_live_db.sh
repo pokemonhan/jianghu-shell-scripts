@@ -42,11 +42,11 @@ docker exec $workspace73Name bash -c "bash /tmp/live_setup/live_migration.sh;"
 ####################################
 ##        Import Live DB First     ##
 ####################################
-#docker exec $mysql5ConName bash -c "mkdir /tmp/mysqlScripts";
-#docker cp import_sql/live_init.sh ${mysql5ConId}:/tmp/mysqlScripts/live_init.sh;
-#docker cp /d/project/deploy/init_sql/live_init_data.sql ${mysql5ConId}:/tmp/mysqlScripts/live_init_data.sql;
-#docker exec $mysql5ConName bash -c "ls /tmp/mysqlScripts/*;chmod -R +x /tmp/mysqlScripts;";
-#docker exec $mysql5ConName bash -c 'bash /tmp/mysqlScripts/live_init.sh;'
+docker exec $mysql5ConName bash -c "mkdir /tmp/mysqlScripts";
+docker cp import_sql/live_init.sh ${mysql5ConId}:/tmp/mysqlScripts/live_init.sh;
+docker cp /d/project/deploy/init_sql/live_init_data.sql ${mysql5ConId}:/tmp/mysqlScripts/live_init_data.sql;
+docker exec $mysql5ConName bash -c "ls /tmp/mysqlScripts/*;chmod -R +x /tmp/mysqlScripts;";
+docker exec $mysql5ConName bash -c 'bash /tmp/mysqlScripts/live_init.sh;'
 #break With User Control
 echo Press Enter...
 read
