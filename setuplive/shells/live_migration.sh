@@ -6,3 +6,4 @@ git -c credential.helper= -c core.quotepath=false -c log.showSignature=false che
 mv phinx.php phinx.php.bak
 php vendor/bin/phinx migrate -e production;
 mv phinx.php.bak phinx.php
+rm -rf /tmp/live_setup;
