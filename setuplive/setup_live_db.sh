@@ -6,24 +6,32 @@ echo "$dockerlist"
 
 function getContainerId() {
 
-  local containerName="$1";
+  local workspace73Name="$1";
     #get Id of Container
-  local workspaceIdLong=$(docker inspect -f  '{{.Id}}'  $containerName)
+  local workspaceIdLong=$(docker inspect -f  '{{.Id}}'  $workspace73Name)
   #get shortcut Id of Container
   local workspaceId=$(cut -c-12 <<< "$workspaceIdLong")
   echo "$workspaceId"
 }
 
-containerName='harris_workspace73_1'
+workspace73Name='harris_workspace73_1'
 #create tmp directory for shell execution
-#docker exec $containerName bash -c "mkdir –p /tmp/live_setup";
-workspace73Id=$(getContainerId "$containerName");
+#docker exec $workspace73Name bash -c "mkdir –p /tmp/live_setup";
+workspace73Id=$(getContainerId "$workspace73Name");
 #echo "here is $workspace73Id Fine";
+
+# Empty Live DB First
+mysql5ConName='harris_mysql5_1'
+mysql5ConId=$(getContainerId "$mysql5ConName");
+docker cp mysqlargs/ ${mysql5ConId}:/tmp/mysqlScripts;
+docker cp shells/drop-mysql-tables.sh ${mysql5ConId}:/tmp/mysqlScripts/;
+docker exec $mysql5ConName bash -c "ls /tmp/mysqlScripts/*;chmod -R +x /tmp/mysqlScripts;";
+docker exec $mysql5ConName bash -c 'bash /tmp/mysqlScripts/live_drop.sh;'
 # Execution of Migration Shell Script
 #echo "docker cp shells ${workspace73Id}:/tmp/live_setup";
 docker cp shells/ ${workspace73Id}:/tmp/live_setup
-docker exec $containerName bash -c "ls /tmp/live_setup/*;chmod -R +x /tmp/live_setup;"
-docker exec $containerName bash -c "bash /tmp/live_setup/live_migration.sh;"
+docker exec $workspace73Name bash -c "ls /tmp/live_setup/*;chmod -R +x /tmp/live_setup;"
+docker exec $workspace73Name bash -c "bash /tmp/live_setup/live_migration.sh;"
 
 #break With User Control
 echo Press Enter...

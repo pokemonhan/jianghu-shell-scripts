@@ -17,9 +17,6 @@
 MUSER="$1"
 MPASS="$2"
 MDB="$3"
-
-echo "1 is $1 and  2 is $2 and 3 is $3"
-exit 1
  
 MHOST="localhost"
  
