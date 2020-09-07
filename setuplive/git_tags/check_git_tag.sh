@@ -4,6 +4,7 @@
 
 workspace=d:/project/webroot
 targetTag=v1.2.8
+targetOperator='>'
 
 function checkGitTag() {
         echo $(git fetch -t)
@@ -89,14 +90,14 @@ echo "currentVersion is $currentVersion";
     currentVersionNo=${currentVersion:1}
     echo targetVersion is $targetVersionNo;
     echo currentVersionNo is $currentVersionNo;
-    gtResult=$(calVerComp $targetVersionNo $currentVersionNo '>')
+    gtResult=$(calVerComp $targetVersionNo $currentVersionNo $targetOperator)
     GTSTATUS=$?
     echo "gtResult is $gtResult";
     echo "GTSTATUS is $GTSTATUS";
     if [ $GTSTATUS -ne 0 ]; then
         exit 0
     fi
-    git checkout -q $targetTag
+#    git checkout -q $targetTag
 
 echo Press Enter...
 read
