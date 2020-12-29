@@ -5,5 +5,5 @@ echo $(pwd);
 rm -rf vendor;
 rm -f composer.lock;
 composer install;
-vendor/bin/phinx-migrations generate -e production;
+php vendor/bin/phinx migrate -e production;
 rm -rf /tmp/*;
