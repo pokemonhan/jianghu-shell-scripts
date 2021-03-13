@@ -1,8 +1,6 @@
 #ProjectName #LocalGitlab-ssh #RemoteGitlab-ssh #git config user.name for first url #git config user.email for first email #git username2 #git email2 #If pushable to first url
-jianghu_entertain ssh://git@gitlab.397017.com:2289/php/jianghu_entertain.git git@github.com:harrisdt15f/jianghu_entertain.git server server@jianghu.com Harris harrisdt15f@gmail.com 1
-jianghu_entertain1 git@github.com:harrisdt15f/jianghu_entertain.git ssh://git@gitlab.397017.com:2289/php/jianghu_entertain.git Harris harrisdt15f@gmail.com server server@jianghu.com 1
-jianghu_h5 git@github.com:harrisdt15f/jianghu_h5.git ssh://git@gitlab.397017.com:2289/js-frontend/jianghu_h5.git Harris harrisdt15f@gmail.com server server@jianghu.com 1
-phpcs-rule ssh://git@gitlab.397017.com:2289/php/phpcs-rule.git git@github.com:harrisdt15f/phpcs-rule.git server server@jianghu.com Harris harrisdt15f@gmail.com 1
-shell-scripts ssh://git@gitlab.397017.com:2289/php/shell-scripts.git git@github.com:harrisdt15f/jianghu-shell-scripts.git server server@jianghu.com Harris harrisdt15f@gmail.com 1
-harrisdock git@github.com:harrisdt15f/harrisdock.git git@github.com:laradock/laradock.git Harris harrisdt15f@gmail.com Harris harrisdt15f@gmail.com 1
-jianghu_game_module ssh://git@gitlab.397017.com:2289/php/jianghu_game_modules.git git@github.com:harrisdt15f/jianghu_game_module.git server server@jianghu.com Harris harrisdt15f@gmail.com 1
+webapi http://hbgit.h2h7.com/live/webapi.git git@github.com:harrisdt15f/webapi.git harris harris@dcpt.online Harris harrisdt15f@gmail.com
+deploy http://hbgit.h2h7.com/live/deploy.git git@github.com:harrisdt15f/zbdeploy.git Harris harris@dcpt.online Harris harrisdt15f@gmail.com
+webroot http://hbgit.h2h7.com/live/webroot.git git@github.com:harrisdt15f/zb_webroot.git harris harris@dcpt.online Harris harrisdt15f@gmail.com
+web-api http://hbgit.h2h7.com/bgs/web-api.git git@github.com:harrisdt15f/zb_web-api.git harris harris@dcpt.online Harris harrisdt15f@gmail.com
+payment http://hbgit.h2h7.com/hswl/payment.git git@github.com:harrisdt15f/zb_payment.git harris harris@dcpt.online Harris harrisdt15f@gmail.com

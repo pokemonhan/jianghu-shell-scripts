@@ -136,4 +136,4 @@ while IFS= read -r line; do
 	fi
 done < $input
 
-scp -i /var/www/server/jianghu-malaysia.pem -r /var/www/jianghu_entertain/storage/statics root@47.254.235.19:/var/www/jianghu_entertain/storage/statics
+#scp -i /var/www/server/jianghu-malaysia.pem -r /var/www/jianghu_entertain/storage/statics root@47.254.235.19:/var/www/jianghu_entertain/storage/statics
