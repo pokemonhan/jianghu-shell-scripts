@@ -1,6 +1,6 @@
 #ProjectName #LocalGitlab-ssh #RemoteGitlab-ssh #git config user.name for first url #git config user.email for first email #git username2 #git email2 #If pushable to first url
-webapi http://hbgit.h2h7.com/live/webapi.git git@github.com:harrisdt15f/webapi.git harris harris@dcpt.online Harris harrisdt15f@gmail.com
-deploy http://hbgit.h2h7.com/live/deploy.git git@github.com:harrisdt15f/zbdeploy.git Harris harris@dcpt.online Harris harrisdt15f@gmail.com
-webroot http://hbgit.h2h7.com/live/webroot.git git@github.com:harrisdt15f/zb_webroot.git harris harris@dcpt.online Harris harrisdt15f@gmail.com
-web-api http://hbgit.h2h7.com/bgs/web-api.git git@github.com:harrisdt15f/zb_web-api.git harris harris@dcpt.online Harris harrisdt15f@gmail.com
-payment http://hbgit.h2h7.com/hswl/payment.git git@github.com:harrisdt15f/zb_payment.git harris harris@dcpt.online Harris harrisdt15f@gmail.com
+webapi git@github.com:harrisdt15f/webapi.git http://hbgit.h2h7.com/live/webapi.git Harris harrisdt15f@gmail.com harris harris@dcpt.online 1
+deploy git@github.com:harrisdt15f/zbdeploy.git http://hbgit.h2h7.com/live/deploy.git Harris harrisdt15f@gmail.com Harris harris@dcpt.online 1
+webroot git@github.com:harrisdt15f/zb_webroot.git http://hbgit.h2h7.com/live/webroot.git Harris harrisdt15f@gmail.com harris harris@dcpt.online 1
+web-api git@github.com:harrisdt15f/zb_web-api.git http://hbgit.h2h7.com/bgs/web-api.git Harris harrisdt15f@gmail.com harris harris@dcpt.online 1
+payment git@github.com:harrisdt15f/zb_payment.git http://hbgit.h2h7.com/hswl/payment.git Harris harrisdt15f@gmail.com harris harris@dcpt.online 1
