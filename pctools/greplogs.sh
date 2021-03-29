@@ -7,7 +7,7 @@ do
   # echo "Processing $f file..."
   out="$(basename $f)"
   echo "Filename is $out"
-  grep -i -e "$word" $f > "$dir$out-Selected.log";
+  grep --text -i -e "$word" $f > "$dir$out-Selected.log";
   # take action on each file. $f store current file name
 done
 echo Press Enter...
