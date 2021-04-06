@@ -133,9 +133,10 @@ function sendFailFile() {
     #Send Telegram Message to Specific Group
 #          https://github.com/topkecleon/telegram-bot-bash
 #          https://github.com/rahiel/telegram-send
-    telegram-send --file "/var/www/tmp/$newfileNew.log" --caption "$currentfilePath"
+#    telegram-send --file "/var/www/tmp/$newfileNew.log" --caption "$currentfilePath"
 }
 
 cd $PROJ_DIR
-git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout develop/harris/original --
+#git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout develop/harris/original --
+git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --
 execEachFile
