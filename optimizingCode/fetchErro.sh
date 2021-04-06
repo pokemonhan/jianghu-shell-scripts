@@ -137,6 +137,5 @@ function sendFailFile() {
 }
 
 cd $PROJ_DIR
-#git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout develop/harris/original --
-git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout master --
+git -c credential.helper= -c core.quotepath=false -c log.showSignature=false checkout develop/harris/original --
 execEachFile
