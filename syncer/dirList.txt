@@ -4,3 +4,4 @@ hxsq-v2 nohash
 xhr-admin-api nohash
 xhr-api nohash
 xhr-partner-api nohash
+mystubtools nohash
