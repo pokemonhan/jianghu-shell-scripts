@@ -64,6 +64,7 @@ function syncDirectory()
         change_line "$ProjectName" "$ProjectName $currentHash" "$input";
         send_message "-781874795" "$ProjectName from $priviousHash to $currentHash";
       fi
+      rm -rf "$syncDirectory/$ProjectName.tar.gz" "$syncDirectory/$ProjectName"
   fi
 }
 
