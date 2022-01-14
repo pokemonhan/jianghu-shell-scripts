@@ -1,7 +1,7 @@
-admin-api nohash
-hxsq-hooks nohash
-hxsq-v2 nohash
-xhr-admin-api nohash
-xhr-api nohash
-xhr-partner-api nohash
-mystubtools nohash
+admin-api 2bea1a84499f6098393839c11ef2eb955c66ceae
+hxsq-hooks 701fd7e776297b91a3dc43a159e1e28ff4177631
+hxsq-v2 4a4037e8551e92b3004ca45492b0c38322eb481b
+xhr-admin-api 9ade38f01d38ceb9c1fe4f5654ca4b8a1ed03141
+xhr-api 9dbd72b92e70ce624290ef89ad7e90bed38ff41a
+xhr-partner-api 18322f7b1b5c8d39213d40881f7ab7c61e2fb19b
+mystubtools 5062e0010c9edb092814e629fa39605273a8929c
