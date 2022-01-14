@@ -49,7 +49,7 @@ function syncDirectory()
   local currentHash=$(git rev-parse HEAD)
   if [[ $priviousHash == $currentHash ]]; then
 #  	     upd="up-to-date"
-  	     send_message "-1001677211266" "${ProjectName} have no updates";
+  	     send_message "-1001677211266" "${ProjectName} have no updates" 2>/dev/null;
   else
       echo "previous hash:"$priviousHash;
       echo "current hash:"$currentHash;
@@ -66,10 +66,11 @@ function syncDirectory()
       local result=$(curl -F "chat_id=-1001677211266" -F "document=@$syncDirectory/$ProjectName.tar.gz" https://api.telegram.org/bot5057710392:AAGwJ2jE4uRHIaTRvqi8HYgqB6bEA0ieMU4/sendDocument | jq --raw-output '.ok' )
       if [ "$result" = true ] ; then
         change_line "$ProjectName" "${ProjectName} ${currentHash}" "$input";
-        send_message "-1001677211266" "${ProjectName}  from ${priviousHash} to ${currentHash} ";
+        send_message "-1001677211266" "${ProjectName}  from ${priviousHash} to ${currentHash} " 2>/dev/null;
       fi
   fi
-  rm -rf "$syncDirectory/{$ProjectName.tar.gz,$ProjectName}";
+  rm -rf "$syncDirectory/$ProjectName" 2>/dev/null;
+  rm -rf "$syncDirectory/$ProjectName.tar.gz" 2>/dev/null;
 }
 
 cd /var/www/telegram-bot-bash/DIST/telegram-bot-bash;
