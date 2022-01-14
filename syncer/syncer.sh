@@ -26,7 +26,7 @@ function change_line {
     local NEW=$(echo "${NEW_LINE}" | escape_slashes)
     # FIX: No space after the option i.
     sed -i.bak '/^'"${OLD_LINE_PATTERN}"'/s/.*/'"${NEW}"'/' "${FILE}"
-    mv "${FILE}.bak" /tmp/
+    mv "${FILE}.bak" "$dir"
 }
 
 function syncDirectory()
